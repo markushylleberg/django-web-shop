@@ -1,0 +1,33 @@
+{% extends './_base.html' %}
+
+{% block content %}
+
+    <div class="m-2">
+
+        <h1><b>Login page</b></h1>
+
+        <p>Don't have an account? <a href="{% url 'signup' %}">Sign up</a></p>
+
+        <form action="{% url 'login' %}" method="POST">
+            {% csrf_token %}
+            <div class="input-pair">
+                <label for="login-username">Username</label>
+                <input type="text" name="login-username" id="login-username" />
+            </div>
+            <div class="input-pair">
+                <label for="login-password">Password</label>
+                <input type="password" name="login-password" id="login-password" />
+            </div>
+            <br />
+            <button class="btn btn-primary">LOGIN</button>
+        </form>
+        <br />
+        <p>Forgot your password? <a href="{% url 'request_reset_password' %}">Reset your password</a></p>
+
+        {% if message %}
+            <p>{{ message }}</p>
+        {% endif %}
+
+    </div>
+
+{% endblock %}

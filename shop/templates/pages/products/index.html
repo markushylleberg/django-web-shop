@@ -1,0 +1,30 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+        <div class="d-flex">
+            {% for product in products %}
+                    <div class="card" style="width: 18rem;">
+                        <img class="card-img-top" style="max-height: 15em" src="{{ product.image.url }}" alt={{ product.title }}>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.title }}</h5>
+                            <p class="card-text">{{ product.price }} kr.</p>
+                            {% for product_attribute in product_attributes %}
+                                {% if product_attribute.entity|stringformat:"s" == product.title|stringformat:"s" %}
+                                    <p>Size: {{ product_attribute.value }}</p>
+                                {% endif %}
+                            {% endfor %}
+                            <div class="text-center">
+                                <form action="{% url 'shop:product_detail' %}">
+                                    <input type="hidden" value={{ product.id }} name="id" />
+                                    <button class="btn btn-secondary">See more</button>
+                                </form>
+                                <br />
+                                <a href={% url 'shop:index' %} class="btn btn-primary">Add to cart</a>
+                            </div>
+                        </div>
+                    </div>
+            {% endfor %}
+        </div>
+
+{% endblock %}

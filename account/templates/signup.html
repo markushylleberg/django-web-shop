@@ -1,0 +1,47 @@
+{% extends './_base.html' %}
+
+{% block content %}
+
+    <div class="m-2">
+
+        <h1><b>Signup page</b></h1>
+
+        <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+
+        <form action="{% url 'signup' %}" method="POST">
+            {% csrf_token %}
+            <div class="input-pair">
+                <label for="first_name">First name</label>
+                <input type="text" name="first_name" id="first_name" />
+            </div>
+            <div class="input-pair">
+                <label for="last_name">Last name</label>
+                <input type="text" name="last_name" id="last_name" />
+            </div>
+            <div class="input-pair">
+                <label for="email">E-mail</label>
+                <input type="email" name="email" id="email" />
+            </div>
+            <div class="input-pair">
+                <label for="username">Username</label>
+                <input type="text" name="username" id="username" />
+            </div>
+            <div class="input-pair">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" />
+            </div>
+            <div class="input-pair">
+                <label for="password_confirm">Confirm password</label>
+                <input type="password" name="password_confirm" id="password_confirm" />
+            </div>
+            <br />
+            <button class="btn btn-primary">SIGN UP</button>
+        </form>
+
+        {% if message %}
+            <p>{{ message }}</p>
+        {% endif %}
+
+    </div>
+
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+    <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href={% url 'shop:index' %}>Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ product.title }}</li>
+    </ol>
+    </nav>
+
+    <div class="row mt-5">
+        <div class="col-md-6 col-sm-12">
+            <img class="img-fluid rounded mx-auto d-block" src="{{ MEDIA_URL }} {{ product.image.url }}" alt="{{ product.title }}" />
+        </div>
+        <div class="col-md-6 col-sm-12">
+            <h6>{{ product.category }}</h6>
+            <h1>{{ product.title }}</h1>
+            <div class="product-desc mt-3">
+                <p>{{ product.description }}</p>
+            </div>
+            <div class="product-attributes mt-5">
+                {% for product_attribute in product_attributes %}
+                    <p><b>{{ product_attribute.attribute }}</b>: {{ product_attribute.value }}</p>
+                {% endfor %}
+            </div>
+            <div class="product-buttons mt-5">
+                <label for="quantity">Quantity</label>
+                    <select id="quantity" name="quantity">
+                        {% for i in quantity %}
+                            <option>{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                <h4 class="my-3"><b>{{ product.price }} kr.</b></h4>
+                <button class="btn btn-primary">Add to cart</button>
+                <button class="btn btn-secondary">+ Wishlist</button>
+            </div>
+        </div>
+
+
+
+    </div>
+
+
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends './_base.html' %}
+
+{% block content %}
+
+    <div class="m-2 text-center align-center justify-content-*">
+        <h1>account settings page</h1>
+
+        <hr />
+        <div>
+            <a href={% url 'change_password' %}>Change password</a>
+        </div>
+        <div>
+            <a href={% url 'delete_account' %}>Delete account</a>
+        </div>
+
+        <hr />
+
+        <h4>Account information</h4>
+        <p>Below are the current information we have about you! Fill out your information for an extra quick checkout experience!</p>
+        <br />
+        <div>
+            <form action="{% url 'account_settings' %}" method="POST">
+                {% csrf_token %}
+                <h6>Name and email</h6>
+                <div class="input-pair">
+                    <label for="account_first_name">First name</label>
+                    <input id="account_first_name" name="account_first_name" type="text" value="{{ first_name }}">
+                </div>
+                <div class="input-pair">
+                    <label for="account_last_name">Last name</label>
+                    <input id="account_last_name" name="account_last_name" type="text" value="{{ last_name }}">
+                </div>
+                <div class="input-pair">
+                    <label for="account_email">Email</label>
+                    <input id="account_email" name="account_email" type="email" value="{{ email }}">
+                </div>
+                <div class="input-pair">
+                    <label for="account_phone">Phone number</label>
+                    <input id="account_phone" name="account_phone" value="{{ phone_number }}">
+                </div>
+            <br />
+                <h6>Delivery details</h6>
+                <div class="input-pair">
+                    <label for="account_address">Address</label>
+                    <input id="account_address" name="account_address" type="text" value="{{ address }}">
+                </div>
+                <div class="input-pair">
+                    <label for="account_city">City</label>
+                    <input id="account_city" name="account_city" value="{{ city }}">
+                </div>
+                <div class="input-pair">
+                    <label for="account_country">Country</label>
+                    <input id="account_country" name="account_country" value="{{ country }}">
+                </div>
+            <br />
+            <button class="btn btn-primary">UPDATE ACCOUNT SETTINGS</button>
+            </form>
+        </div>
+        {% if message %}
+            <p>{{ message }}</p>
+        {% endif %}
+    </div>
+
+{% endblock %}
