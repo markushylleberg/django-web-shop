@@ -5,6 +5,41 @@
     <div class="m-3">
         <h1>Search page</h1>
         <p>Having trouble finding the items you want? Do a quick search!</p>
+
+        <form action="{% url 'shop:search' %}" method="POST">
+            {% csrf_token %}
+            {% for attribute in attributes %}
+
+            <div class="input-pair">
+                <label for="{{ attribute.attribute }}">{{ attribute.attribute }}</label>
+                    <select id="{{ attribute.attribute }}" name="{{ attribute.id }}">
+                        <option></option>
+                    {% for value in values %}
+                        {% if value.attribute == attribute.id %}
+                            <option value="{{ value.value }}">{{ value.value }}</option>
+                        {% endif %}
+                    {% endfor %}
+                    </select>
+            </div>
+            {% endfor %}
+            <div class="mt-2">
+            <button>Search</button>
+            </div>
+        </form>
+
+        <hr />
+
+        <div class="search-results-container row">
+            {% if products %}
+                {% for product in products %}
+                    <div class="card col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                        <img class="card-img-top img-fluid" style="max-height: 15em" src="{{ product.image.url }}">
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        
+
     </div>
 
 {% endblock %}
