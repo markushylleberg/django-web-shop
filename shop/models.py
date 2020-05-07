@@ -12,13 +12,20 @@ class ProductCategory(models.Model):
 class Product(models.Model):
     title = models.CharField(max_length=150)
     description = models.TextField()
+    category = models.ForeignKey(ProductCategory, null=True, on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return f'{self.id}'
+
+
+class ProductVariant(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=19, decimal_places=2)
     stock = models.PositiveIntegerField()
-    category = models.ForeignKey(ProductCategory, null=True, on_delete=models.SET_NULL)
     image = models.ImageField(validators=[FileExtensionValidator(allowed_extensions=['jpg', 'png', 'jpeg'])])
 
     def __str__(self):
-        return self.title
+        return f'{self.product.title} - {self.image} - {self.price}'
 
 
 class ProductAttributeOption(models.Model):
@@ -29,9 +36,9 @@ class ProductAttributeOption(models.Model):
 
 
 class ProductAttribute(models.Model):
-    entity = models.ForeignKey(Product, on_delete=models.CASCADE)
+    entity = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
     attribute = models.ForeignKey(ProductAttributeOption, on_delete=models.CASCADE)
     value = models.CharField(max_length=180)
 
     def __str__(self):
-        return f'{self.value}'
+        return f'{self.entity.product.title} - {self.entity.image} - {self.entity.price}'

@@ -2,21 +2,32 @@
 
 {% block content %}
 
-        <div class="d-flex">
-            {% for product in products %}
-                    <div class="card" style="width: 18rem;">
-                        <img class="card-img-top" style="max-height: 15em" src="{{ product.image.url }}" alt={{ product.title }}>
+        <div class="row m-3">
+            {% for product_variant in product_variants %}
+                    <div class="card col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                        <img class="card-img-top img-fluid" style="max-height: 15em" src="{{ product_variant.image.url }}" alt={{ product.title }}>
                         <div class="card-body">
-                            <h5 class="card-title">{{ product.title }}</h5>
-                            <p class="card-text">{{ product.price }} kr.</p>
+                            {% for product in products %}
+                                {% if product.id|stringformat:"s" == product_variant.product|stringformat:"s" %}
+                                    <h5 class="card-title">{{ product.title }}</h5>
+                                {% endif %} 
+                            {% endfor %}
+                            <p class="card-text">{{ product_variant.price }} kr.</p>
+
                             {% for product_attribute in product_attributes %}
-                                {% if product_attribute.entity|stringformat:"s" == product.title|stringformat:"s" %}
+                                {% if product_attribute|stringformat:"s" == product_variant.id|stringformat:"s" %}
                                     <p>Size: {{ product_attribute.value }}</p>
                                 {% endif %}
                             {% endfor %}
+
                             <div class="text-center">
                                 <form action="{% url 'shop:product_detail' %}">
-                                    <input type="hidden" value={{ product.id }} name="id" />
+                                {% for product in products %}
+                                    {% if product.id|stringformat:"s" == product_variant.product|stringformat:"s" %}
+                                        <input type="hidden" value="{{ product.id }}" name="product_id" />
+                                    {% endif %}
+                                {% endfor %}
+                                    <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
                                     <button class="btn btn-secondary">See more</button>
                                 </form>
                                 <br />

@@ -7,5 +7,6 @@ app_name = 'shop'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('product/', views.product_detail, name='product_detail')
+    path('product/', views.product_detail, name='product_detail'),
+    path('search/', views.search, name='search')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

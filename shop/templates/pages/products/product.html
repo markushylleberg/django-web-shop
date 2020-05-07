@@ -11,7 +11,7 @@
 
     <div class="row mt-5">
         <div class="col-md-6 col-sm-12">
-            <img class="img-fluid rounded mx-auto d-block" src="{{ MEDIA_URL }} {{ product.image.url }}" alt="{{ product.title }}" />
+            <img class="img-fluid rounded mx-auto d-block" src="{{ MEDIA_URL }} {{ product_variant.image.url }}" alt="{{ product.title }}" />
         </div>
         <div class="col-md-6 col-sm-12">
             <h6>{{ product.category }}</h6>
@@ -24,6 +24,26 @@
                     <p><b>{{ product_attribute.attribute }}</b>: {{ product_attribute.value }}</p>
                 {% endfor %}
             </div>
+
+            <div class="product-variants-container">
+                <div class="d-flex">
+                {% for product_other_variant in product_other_variants %}
+                    {% if product_variant.id is not product_other_variant.id %}
+                        <div class="card m-1 w-25 text-center">
+                            <form action="{% url 'shop:product_detail' %}">
+                                <input type="hidden" value="{{ product.id }}" name="product_id" />
+                                <input type="hidden" value="{{ product_other_variant.id }}" name="product_variant_id" />
+                                <button>
+                                    <img class="img-fluid" src="{{ MEIDA_URL }}{{ product_other_variant.image.url }}">{{product_other_variant.}}</img>
+                                    <p>{{ product_other_variant.price }}</p>
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                </div>
+            </div>
+
             <div class="product-buttons mt-5">
                 <label for="quantity">Quantity</label>
                     <select id="quantity" name="quantity">
@@ -31,9 +51,11 @@
                             <option>{{ i }}</option>
                         {% endfor %}
                     </select>
-                <h4 class="my-3"><b>{{ product.price }} kr.</b></h4>
+                <h4 class="my-3"><b>{{ product_variant.price }} kr.</b></h4>
                 <button class="btn btn-primary">Add to cart</button>
-                <button class="btn btn-secondary">+ Wishlist</button>
+                {% if user.is_authenticated %}
+                    <button class="btn btn-secondary">+ Wishlist</button>
+                {% endif %}
             </div>
         </div>
 
