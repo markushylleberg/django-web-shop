@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import FileExtensionValidator
+from django.contrib.auth.models import User
 
 
 class ProductCategory(models.Model):
@@ -42,3 +43,11 @@ class ProductAttribute(models.Model):
 
     def __str__(self):
         return f'{self.entity.product.title} - {self.entity.image} - {self.entity.price}'
+
+
+class UserProductVariantWishlist(models.Model):
+    product_variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.user.get_username()} - {self.product_variant.product.title}'

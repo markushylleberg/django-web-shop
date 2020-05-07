@@ -2,24 +2,22 @@
 
 {% block content %}
 
-
-    <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item active"><a href={% url 'shop:index' %}>Home</a></li>
-    </ol>
-    </nav>
+    <div class="m-3">
+        <h1>Wishlist</h1>
 
         <div class="row m-3">
             {% for product_variant in product_variants %}
-                    <div class="card col-lg-3 col-md-4 col-sm-6 col-xs-12">
-                        <img class="card-img-top img-fluid" style="max-height: 15em" src="{{ product_variant.image.url }}" alt={{ product.title }}>
-                        <div class="card-body">
+                    <div class="row d-block">
+                        <div class="col-3">
+                            <img class="card-img-top img-fluid" style="max-height: 15em" src="{{ product_variant.image.url }}" alt={{ product.title }}>
+                        </div>
+                        <div class="col-8">
                             {% for product in products %}
                                 {% if product.id|stringformat:"s" == product_variant.product|stringformat:"s" %}
-                                    <h5 class="card-title">{{ product.title }}</h5>
+                                    <h5>{{ product.title }}</h5>
                                 {% endif %} 
                             {% endfor %}
-                            <p class="card-text">{{ product_variant.price }} kr.</p>
+                            <p>{{ product_variant.price }} kr.</p>
 
                             {% for product_attribute in product_attributes %}
                                 {% if product_attribute|stringformat:"s" == product_variant.id|stringformat:"s" %}
@@ -38,19 +36,16 @@
                                     <button class="btn btn-secondary">See more</button>
                                 </form>
                                 <div class="mt-1">
-                                    <form action="{% url 'shop:addtowishlist' %}" method="POST">
-                                        {% csrf_token %}
-                                        <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
-                                        <button class="btn btn-primary">Add to wishlist</button>
-                                    </form>
-                                </div>
-                                <div class="mt-1">
                                     <a href={% url 'shop:index' %} class="btn btn-primary">Add to cart</a>
                                 </div>
                             </div>
-                        </div>
                     </div>
+                </div>
             {% endfor %}
         </div>
+
+
+
+    </div>
 
 {% endblock %}

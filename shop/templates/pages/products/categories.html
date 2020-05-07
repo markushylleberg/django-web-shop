@@ -1,0 +1,88 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+        {% if categories %}
+            <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href={% url 'shop:index' %}>Home</a></li>
+                {% if categories %}
+                    <li class="breadcrumb-item active" aria-current="page">Categories</li>
+                {% endif %}
+            </ol>
+            </nav>
+        {% else %}
+            <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href={% url 'shop:index' %}>Home</a></li>
+                <li class="breadcrumb-item"><a href={% url 'shop:categories' %}>Categories</a></li>
+                {% if category_products %}
+                    <li class="breadcrumb-item active">{{ category_title }}</li>
+                {% endif %}
+            </ol>
+            </nav>
+        {% endif %}
+
+    <div class="m-3 row">
+        <h1>Categories</h1>
+
+        {% if categories %}
+            {% for category in categories %}
+                <div class="col-12 my-5 py-5 text-center border border-primary">
+                    <form action="{% url 'shop:categories' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" value={{ category.id }} name="category_id" />
+                    <button>
+                        <h1>{{ category.category }}</h1>
+                    </button>
+                    </form>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if category_products %}
+
+            <div class="row m-3">
+                {% for category_product_variant in category_product_variants %}
+                        <div class="card col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <img class="card-img-top img-fluid" style="max-height: 15em" src="{{ category_product_variant.image.url }}" alt={{ product.title }}>
+                            <div class="card-body">
+                                <h5 class="card-title">{{ category_title }}</h5>
+                                <p class="card-text">{{ category_product_variant.price }} kr.</p>
+
+                                {% for product_attribute in product_attributes %}
+                                    {% if product_attribute|stringformat:"s" == product_variant.id|stringformat:"s" %}
+                                        <p>Size: {{ product_attribute.value }}</p>
+                                    {% endif %}
+                                {% endfor %}
+
+                                <div class="text-center">
+                                    <form action="{% url 'shop:product_detail' %}">
+                                    {% for category_product in category_products %}
+                                        {% if category_product.id|stringformat:"s" == category_product_variant.product|stringformat:"s" %}
+                                            <input type="hidden" value="{{ category_product.id }}" name="product_id" />
+                                        {% endif %}
+                                    {% endfor %}
+                                        <input type="hidden" value="{{ category_product_variant.id }}" name="product_variant_id" />
+                                        <button class="btn btn-secondary">See more</button>
+                                    </form>
+                                    <div class="mt-1">
+                                        <form action="{% url 'shop:addtowishlist' %}" method="POST">
+                                            {% csrf_token %}
+                                            <input type="hidden" value="{{ category_product_variant.id }}" name="product_variant_id" />
+                                            <button class="btn btn-primary">Add to wishlist</button>
+                                        </form>
+                                    </div>
+                                    <div class="mt-1">
+                                        <a href={% url 'shop:index' %} class="btn btn-primary">Add to cart</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                {% endfor %}
+            </div>
+
+        {% endif %}
+    </div>
+
+{% endblock %}

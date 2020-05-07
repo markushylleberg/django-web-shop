@@ -30,11 +30,46 @@
         <hr />
 
         <div class="search-results-container row">
-            {% if products %}
-                {% for product in products %}
-                    <div class="card col-lg-3 col-md-4 col-sm-6 col-xs-12">
-                        <img class="card-img-top img-fluid" style="max-height: 15em" src="{{ product.image.url }}">
-                    </div>
+            {% if product_variants %}
+                {% for product_variant in product_variants %}
+                        <div class="card col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <img class="card-img-top img-fluid" style="max-height: 15em" src="{{ product_variant.image.url }}" alt={{ product.title }}>
+                            <div class="card-body">
+                                {% for product in products %}
+                                    {% if product.id|stringformat:"s" == product_variant.product|stringformat:"s" %}
+                                        <h5 class="card-title">{{ product.title }}</h5>
+                                    {% endif %} 
+                                {% endfor %}
+                                <p class="card-text">{{ product_variant.price }} kr.</p>
+
+                                {% for product_attribute in product_attributes %}
+                                    {% if product_attribute|stringformat:"s" == product_variant.id|stringformat:"s" %}
+                                        <p>Size: {{ product_attribute.value }}</p>
+                                    {% endif %}
+                                {% endfor %}
+
+                                <div class="text-center">
+                                    <form action="{% url 'shop:product_detail' %}">
+                                    {% for product in products %}
+                                        {% if product.id|stringformat:"s" == product_variant.product|stringformat:"s" %}
+                                            <input type="hidden" value="{{ product.id }}" name="product_id" />
+                                        {% endif %}
+                                    {% endfor %}
+                                        <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
+                                        <button class="btn btn-secondary">See more</button>
+                                    </form>
+                                    <div class="mt-1">
+                                        <form action="{% url 'shop:addtowishlist' %}" method="POST">
+                                            {% csrf_token %}
+                                            <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
+                                            <button class="btn btn-primary">Add to wishlist</button>
+                                        </form>
+                                    </div>
+                                    <br />
+                                    <a href={% url 'shop:index' %} class="btn btn-primary">Add to cart</a>
+                                </div>
+                            </div>
+                        </div>
                 {% endfor %}
             {% endif %}
         </div>
