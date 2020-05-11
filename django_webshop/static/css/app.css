@@ -1,0 +1,12 @@
+.disabled {
+    opacity: .3;
+    pointer-events: none;
+}
+
+.order-confirm-wrapper img, .small-img {
+    max-width: 60px;
+}
+
+.large-text {
+    font-size: 28px;
+}

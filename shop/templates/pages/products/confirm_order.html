@@ -1,0 +1,60 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+    <div class="m-4">
+        <h1>Confirm order</h1>
+        <a href="{% url 'shop:checkout' %}"><-- Back to order details</a>
+            <table class="table">
+            <thead>
+                <tr>
+                <th scope="col">Product</th>
+                <th scope="col">Title</th>
+                <th scope="col">Price</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+        {% for cart_product in cart_products %}
+                <tr>
+                <td><img class="small-img" src="{{ MEDIA_URL }} {{ cart_product.product_variant.image.url }}" /></td>
+                <td>{{ cart_product.product_variant.product.title }}</td>
+                <td>{{ cart_product.product_variant.price }} kr.</td>
+                <td>{{ cart_product.quantity }}</td>
+                <td>{{ cart_product.total }}</td>
+                </tr>
+        {% endfor %}
+            </tbody>
+            </table>
+        <div class="confirm-container text-center px-5">
+            <h4>Delivery information</h4>
+                <p><i>Name:</i> {{ user_profile.first_name }} {{ user_profile.last_name }}</p>
+                <p><i>Address:</i> {{ user_profile.address }} {{ user_profile.city }}, {{ user_profile.country }}</p>
+                <p><i>Phone:</i> {{ user_profile.phone }}</p>
+            <hr />
+            <h4>Shipping information</h4>
+            {% if shipping.id == 2 %}
+                <p>Shipping method: <b>{{ shipping }}</b> to <b>{{ user_profile.address }}</b></p>
+            {% else %}
+                <p>Shipping method: <b>{{ shipping }}</b> to <b>the shop neareast you</b></p>
+            {% endif %}
+            <hr />
+            <h4>Order total</h4>
+            <p>Cart: <b>{{ cart_total }} kr.</b></p>
+            <p>+ Shipping: <b>{{ shipping.price }} kr.</b></p>
+            <p class="large-text">Total price: <b><u>{{ cart_total|add:shipping.price }} kr.</u></b></p>
+            <p>We will send a confirmation mail to <i><u>{{ user.email }}</u></i></p>
+            <form action="{% url 'shop:confirmation' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="confirm_address" value="{{ user_profile.address }}" />
+                <input type="hidden" name="confirm_city" value="{{ user_profile.city }}" />
+                <input type="hidden" name="confirm_country" value="{{ user_profile.country }}" />
+                <input type="hidden" name="confirm_shipping_method" value="{{ shipping.id }}" />
+                <input type="hidden" name="confirm_email" value="{{ user.email }}" />
+                <button class="btn btn-primary">PLACE ORDER</button>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

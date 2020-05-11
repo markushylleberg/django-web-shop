@@ -59,14 +59,20 @@
                                         <button class="btn btn-secondary">See more</button>
                                     </form>
                                     <div class="mt-1">
-                                        <form action="{% url 'shop:addtowishlist' %}" method="POST">
+                                        <form action="{% url 'shop:add_to_wishlist' %}" method="POST">
                                             {% csrf_token %}
                                             <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
                                             <button class="btn btn-primary">Add to wishlist</button>
                                         </form>
                                     </div>
-                                    <br />
-                                    <a href={% url 'shop:index' %} class="btn btn-primary">Add to cart</a>
+                                    {% comment %} <div class="mt-1">
+                                        <form action="{% url 'shop:add_to_cart' %}" method="POST">
+                                            {% csrf_token %}
+                                            <input type="hidden" value="1" name="quantity" />
+                                            <input type="hidden" value={{ product_variant.id }} name="product_variant_id" />
+                                            <button class="btn btn-primary">Add to cart</button>
+                                        </form>
+                                    </div> {% endcomment %}
                                 </div>
                             </div>
                         </div>

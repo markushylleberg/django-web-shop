@@ -45,14 +45,26 @@
             </div>
 
             <div class="product-buttons mt-5">
-                <label for="quantity">Quantity</label>
-                    <select id="quantity" name="quantity">
-                        {% for i in quantity %}
-                            <option>{{ i }}</option>
-                        {% endfor %}
-                    </select>
-                <h4 class="my-3"><b>{{ product_variant.price }} kr.</b></h4>
-                <button class="btn btn-primary">Add to cart</button>
+
+                <form action="{% url 'shop:add_to_cart' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
+                        {% if quantity %}
+                            <label for="quantity">Quantity</label>
+                            <select id="quantity" name="quantity">
+                                {% for i in quantity %}
+                                    <option>{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        {% endif %}
+                    <h4 class="my-3"><b>{{ product_variant.price }} kr.</b></h4>
+                    {% if quantity %}
+                        <button class="btn btn-primary">Add to cart</button>
+                    {% else %}
+                        <p class="text-danger">Not available at the moment</p>
+                    {% endif %}
+                </form>
+
                 {% if user.is_authenticated %}
                     <button class="btn btn-secondary">+ Wishlist</button>
                 {% endif %}

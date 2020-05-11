@@ -1,0 +1,118 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+        <form action="{% url 'shop:confirm_order' %}" method="POST" class="row m-3">
+        {% csrf_token %}
+            <div class="col-12">
+                <h1>Delivery and payment</h1>
+                <a href="{% url 'shop:cart' %}"><-- Back to cart</a>
+            </div>
+            <div class="col-4 mt-3 p-3 border text-center">
+                <h3>Delivery information</h3>
+                <div class="row">
+                {% if user.is_authenticated %}
+                    <div class="input-pair col-12">
+                        <label for="checkout_firstname">First name</label>
+                        <input type="text" name="checkout_firstname" value="{{ user.first_name }}" id="checkout_firstname" />
+                    </div>
+                    <div class="input-pair col-12">
+                        <label for="checkout_lastname">Last name</label>
+                        <input type="text" name="checkout_lastname" value="{{ user.last_name }}" id="checkout_lastname" />
+                    </div>
+                    <div class="input-pair col-12">
+                        <label for="checkout_address">Address</label>
+                        <input type="text" name="checkout_address" value="{{ user_profile.address }}" id="checkout_address" />
+                    </div>
+                    <div class="input-pair col-12">
+                        <label for="checkout_city">City</label>
+                        <input type="text" name="checkout_city" value="{{ user_profile.city }}" id="checkout_city" />
+                    </div>
+                    <div class="input-pair col-12">
+                        <label for="checkout_country">Country</label>
+                        <input type="text" name="checkout_country" value="{{ user_profile.country }}" id="checkout_country" />
+                    </div>
+                    <div class="input-pair col-12">
+                        <label for="checkout_phone">Phone</label>
+                        <input type="text" name="checkout_phone" value="{{ user_profile.phone_number }}" id="checkout_phone" />
+                    </div>
+                {% else %}
+                    <div class="input-pair col-12">
+                        <label for="checkout_firstname">First name</label>
+                        <input type="text" name="checkout_firstname" id="checkout_firstname" />
+                    </div>
+                    <div class="input-pair col-12">
+                        <label for="checkout_lastname">Last name</label>
+                        <input type="text" name="checkout_lastname" id="checkout_lastname" />
+                    </div>
+                    <div class="input-pair col-12">
+                        <label for="checkout_address">Address</label>
+                        <input type="text" name="checkout_address" id="checkout_address" />
+                    </div>
+                    <div class="input-pair col-12">
+                        <label for="checkout_city">City</label>
+                        <input type="text" name="checkout_city" id="checkout_city" />
+                    </div>
+                    <div class="input-pair col-12">
+                        <label for="checkout_country">Country</label>
+                        <input type="text" name="checkout_country" id="checkout_country" />
+                    </div>
+                    <div class="input-pair col-12">
+                        <label for="checkout_phone">Phone</label>
+                        <input type="text" name="checkout_phone" id="checkout_phone" />
+                    </div>
+                {% endif %}
+                </div>
+            </div>
+            <div class="col-4 mt-3 p-3 border text-center">
+                <h3>Delivery method</h3>
+                <div class="select-pair">
+                    <div>
+                        <label for="checkout_shipping_method">Select shipping method</label>
+                    </div>
+                    <select id="checkout_shipping_method" name="checkout_shipping_method">
+                        {% for shipping_method in shipping_methods %}
+                            <option value="{{ shipping_method.id }}">{{ shipping_method }} | {{ shipping_method.price }} kr</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br />
+                <br />
+                <br />
+                <h3>Payment method</h3>
+                <div class="select-pair">
+                    <div>
+                        <label for="checkout_payment_method">Select payment method</label>
+                    </div>
+                    <select id="checkout_payment_method" name="checkout_payment_method">
+                        <option value="1">User test money</option>
+                        <option value="2" disabled>VISA</option>
+                        <option value="3" disabled>Mastercard</option>
+                        <option value="4" disabled>MobilePay</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-4 mt-3 p-3 border text-center order-confirm-wrapper">
+                <h3 class="mb-3">Cart</h3>
+                {% for cart_product in cart_products %}
+                    <div class="order-confirm-entry row">
+                        <div class="col-4">
+                            <img src="{{ MEIDA_URL }}{{ cart_product.product_variant.image.url }}">
+                        </div>
+                        <div class="col-4">
+                        <p>x {{ cart_product.quantity }}</p>
+                        </div>
+                        <div class="col-4">
+                            <p>{{ cart_product.total }} kr.</p>
+                        </div>
+                    </div>
+                    <hr />
+                {% endfor %}
+                <div class="text-right p-3">
+                    <p class="large-text">Total: <b>{{ cart_total }} kr.</b></p>
+                    <button class="btn btn-primary">Next</button>
+                </div>
+            </div>
+        </form>
+
+{% endblock %}

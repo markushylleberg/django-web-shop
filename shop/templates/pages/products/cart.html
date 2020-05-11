@@ -1,0 +1,79 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+    <div class="m-3">
+        <h1>Cart</h1>
+        {% for cart_product in cart_products %}
+            {% for product_variant in product_variants %}
+                {% if cart_product == product_variant.id %}
+                    <div class="row border">
+                        <div class="col-3">
+                            <form action="{% url 'shop:product_detail' %}">
+                            {% for product in products %}
+                                {% if product.id|stringformat:"s" == product_variant.product|stringformat:"s" %}
+                                    <input type="hidden" value="{{ product.id }}" name="product_id" />
+                                {% endif %}
+                            {% endfor %}
+                                <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
+                                <button>
+                                    <img class="card-img-top img-fluid" style="max-height: 15em" src="{{ product_variant.image.url }}" alt={{ product.title }}>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-3 h-100">
+                            {% for product in products %}
+                                {% if product.id|stringformat:"s" == product_variant.product|stringformat:"s" %}
+                                    <h5 class="align-middle">{{ product.title }}</h5>
+                                    <p>{{ product_variant.price }} kr.</p>
+                                {% endif %} 
+                            {% endfor %}
+                        </div>
+                        {% for cart_product_quantity in cart_product_quantities %}
+                            {% if cart_product_quantity.product_variant_id == cart_product %}
+                                <div class="col-3 d-flex h-100">
+                                    <form action="{% url 'shop:increase_quantity' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" value="{{ cart_product_quantity.product_variant_id }}" name="product_variant_id">
+                                        <button>+</button>
+                                    </form>
+
+                                    <p>Quantity: {{ cart_product_quantity.quantity }}</p>
+
+                                    <form action="{% url 'shop:decrease_quantity' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" value="{{ cart_product_quantity.product_variant_id }}" name="product_variant_id">
+                                        <button>-</button>
+                                    </form>
+
+                                    <form action="{% url 'shop:remove_product_from_cart' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" value="{{ cart_product_quantity.product_variant_id }}" name="product_variant_id">
+                                        <button class="mx-4">Remove item</button>
+                                    </form>
+                                </div>
+                                <div class="col-3">
+                                    <p>Total: {{ cart_product_quantity.total }}</p>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+        <div class="m-3">
+            <p class="large-text text-right">Total: <b>{{ cart_total }} kr.</b></p>
+        </div>
+        <div class="m-3">
+            {% if cart_total > 0 %}
+                <div class="check-out-wrapper text-right">
+                    <form action="{% url 'shop:checkout' %}" method="POST">
+                        {% csrf_token %}
+                        <button class="btn btn-primary">Next</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}

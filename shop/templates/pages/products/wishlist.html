@@ -35,9 +35,9 @@
                                     <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
                                     <button class="btn btn-secondary">See more</button>
                                 </form>
-                                <div class="mt-1">
+                                {% comment %} <div class="mt-1">
                                     <a href={% url 'shop:index' %} class="btn btn-primary">Add to cart</a>
-                                </div>
+                                </div> {% endcomment %}
                             </div>
                     </div>
                 </div>

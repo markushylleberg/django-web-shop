@@ -38,7 +38,9 @@
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href={% url 'shop:index' %}>My orders</a>
                             <a class="dropdown-item" href={% url 'account_settings' %}>Account settings</a>
-                            <a class="dropdown-item" href={% url 'shop:index' %}><i class="fa fa-plus"></i> Sales</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href={% url 'shop:index' %}><i class="fa fa-list"></i> Orders</a>
+                            <a class="dropdown-item" href={% url 'shop:index' %}><i class="fa fa-money"></i> Sales</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href={% url 'logout' %}>Logout</a>
                             </div>
@@ -47,7 +49,7 @@
                             <a class="nav-link" href={% url 'shop:wishlist' %}>Wishlist<span class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href={% url 'shop:index' %}><i class="fa fa-shopping-cart"></i> Cart<span class="sr-only">(current)</span></a>
+                            <a class="nav-link" href={% url 'shop:cart' %}><i class="fa fa-shopping-cart"></i> Cart<span class="sr-only">(current)</span></a>
                         </li>
                     </ul>
                 </div>
@@ -85,7 +87,7 @@
                             <a class="nav-link" href={% url 'shop:wishlist' %}>Wishlist<span class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href={% url 'shop:index' %}><i class="fa fa-shopping-cart"></i> Cart<span class="sr-only">(current)</span></a>
+                            <a class="nav-link" href={% url 'shop:cart' %}><i class="fa fa-shopping-cart"></i> Cart<span class="sr-only">(current)</span></a>
                         </li>
                     </ul>
                 </div>
@@ -116,7 +118,7 @@
                         <a class="nav-link" href={% url 'signup' %}>Signup<span class="sr-only">(current)</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href={% url 'shop:index' %}><i class="fa fa-shopping-cart"></i> Cart<span class="sr-only">(current)</span></a>
+                        <a class="nav-link" href={% url 'shop:cart' %}><i class="fa fa-shopping-cart"></i> Cart<span class="sr-only">(current)</span></a>
                     </li>
                 </ul>
             </div>
