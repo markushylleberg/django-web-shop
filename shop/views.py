@@ -428,3 +428,36 @@ def confirmation(req):
     }
 
     return render(req, 'pages/products/confirmation.html', context)
+
+
+def orders(req):
+
+    orders = Invoice.objects.filter(user=req.user)
+
+    context = {
+        'orders': orders
+    }
+    return render(req, 'pages/products/my_orders.html', context)
+
+
+def order_detail(req):
+
+    if req.method == 'POST':
+        if req.user.is_authenticated:
+            order_id = req.POST['order_id']
+
+            order = Invoice.objects.filter(Q(user=req.user), Q(id=order_id))[0]
+            order_products = InvoiceProduct.objects.filter(invoice=order_id)
+
+            cart_total = order.total_price - order.shipping_method.price
+            print(cart_total)
+
+            context = {
+                'order': order,
+                'order_products': order_products,
+                'cart_total': cart_total
+            }
+        else:
+            print('User is not logged in')
+
+    return render(req, 'pages/products/order_details.html', context)

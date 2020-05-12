@@ -1,0 +1,61 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+    <div class="m-3">
+        <h4>Details on order #{{ order.id }}</h4>
+        <a href="{% url 'shop:orders' %}"><-- back to orders</a>
+        <br />
+        <br />
+        <h1 class="text-secondary mx-3">Order #{{ order.id }}</h1>
+        <div class="row m-3">
+            <div class="col-4 text-center border p-3">
+                <h3>Products you've ordered</h3>
+                <hr />
+                {% for order_product in order_products %}
+                    <div class="w-100 row">
+                        <div class="col-3">
+                            <img class="small-img col-4 align-middle" src="{{ MEDIA_URL }} {{ order_product.product.image.url }}">
+                        </div>
+                        <div class="col-3">
+                            <p>{{ order_product.quantity }}x</p>
+                        </div>
+                        <div class="col-3">
+                            <p>{{ order_product.product.product.title }}</p>
+                        </div>
+                        <div class="col-3">
+                            <p>{{ order_product.product.price }} kr.</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="col-4 text-center border p-3">
+                <h3>Where it is heading</h3>
+                <hr />
+                <p>{{ order.shipping_address }}</p>
+                <p>{{ order.shipping_city }}</p>
+                <p>{{ order.shipping_country }}</p>
+
+            </div>
+            <div class="col-4 text-center border p-3">
+                <h3>Payment</h3>
+                <hr />
+                <div class="row">
+                    <div class="col-6 text-left pr-0 pl-4">
+                        <p>Cart:</p>
+                        <p>Shipping:</p>
+                        <hr />
+                        <p><b>Total:</b></p>
+                    </div>
+                    <div class="col-6 text-right pl-0 pr-4">
+                        <p>{{ cart_total }} kr.</p>
+                        <p>{{ order.shipping_method.price }} kr.</p>
+                        <hr />
+                        <p><b>{{ order.total_price }} kr.</b></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

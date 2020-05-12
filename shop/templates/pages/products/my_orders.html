@@ -1,0 +1,43 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+    <div class="m-3">
+        <h1>My orders</h1>
+
+            <table class="table">
+            <thead>
+                <tr>
+                <th scope="col">Order #</th>
+                <th scope="col">Order placed</th>
+                <th scope="col">Shipping address</th>
+                <th scope="col">Shipping method</th>
+                <td scope="col"><b>Total price</b></th>
+                <td scope="col"><b>Order status</b></th>
+                <td scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <th scope="row">Order #{{ order.id }}</th>
+                        <td>{{ order.transaction_datetime }}</td>
+                        <td>{{ order.shipping_address }}</td>
+                        <td>{{ order.shipping_method.shipping_method }}</td>
+                        <td>{{ order.total_price }}</td>
+                        <th scope="row" class="text-success">{{ order.status }}</th>
+                        <td>
+                        <form action="{% url 'shop:order_detail' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" value="{{ order.id }}" name="order_id">
+                            <button class="btn btn-secondary">See more</button>
+                        </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+
+    </div>
+
+{% endblock %}
