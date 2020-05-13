@@ -1,0 +1,35 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+    <div class="m-3">
+        <h1 class="text-center">Sales dashboard</h1>
+        <hr />
+        <div class="py-2">
+            <h4 class="px-2 text-info">Overview <i class="fa fa-check text-info"></i> </h4>
+            <p class="large-text"><i>Total orders:</i><b> {{ total_invoices }} </b></p>
+            <p class="large-text"><i>Total revenue:</i><span class="text-success"><b> {{ total_revenue.sum }} kr.</b></span></p>
+        </div>
+        <hr />
+        <div class="py-2">
+            <h4 class="px-2 text-info">Top 3 best selling products <i class="fa fa-check text-info"></i> </h4>
+                {% for best_seller_product in best_seller_products %}
+                    {% for product in best_seller_product.product %}
+                    <div class="d-flex p-3 my-3 border">
+                        <img class="small-img" src="{{ MEDIA_URL }} {{ product.image.url }}" />
+                        <div class="mx-2 pl-3">
+                            <p><b>{{ product.product.title }}</b></p>
+                            <p><span><b>{{ best_seller_product.count }}</b></span> units sold</p>
+                        </div>
+                        <div class="mx-2 text-center border-left pl-3">
+                            <p>Total revenue from this product:</p>
+                            <p class="text-success"><b>{{ best_seller_product.total }} kr.</b></p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endfor %}
+        </div>
+        <hr />
+    </div>
+
+{% endblock %}

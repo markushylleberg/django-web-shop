@@ -1,0 +1,71 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+    <div class="m-3">
+        <h1>Order overview</h1>
+
+        <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Order #</th>
+                <th scope="col">Products</th>
+                <th scope="col">Shipped to</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for invoice in invoices %}
+                <tr>
+                    <th scope="row">Order #{{ invoice.id }}</th>
+                    <td>
+                        {% for invoice_product in invoice_products %}
+                            {% if invoice_product.invoice.id == invoice.id %}
+                                <div class="d-flex my-1">
+                                    <p>{{ invoice_product.quantity }} x {{ invoice_product.product.product.title }}</p>
+                                    <img class="very-small-img" src="{{ invoice_product.product.image.url }}">
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <div>
+                            <p>{{ invoice.user.first_name }} {{ invoice.user.last_name }}</p>
+                            <p>{{ invoice.user.email }}</p>
+                            <p>{{ invoice.shipping_address }}, {{ invoice.shipping_city }} {{ invoice.shipping_country }}</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="text-center">
+                            {% if invoice.status == 'Confirmed' %}
+                                <i class="fa fa-exclamation text-danger"></i>
+                                <p class="text-danger">{{ invoice.status }}</p>
+                            {% elif invoice.status == 'Shipped' %}
+                                <i class="fa fa-truck text-info"></i>
+                                <p class="text-info">{{ invoice.status }}</p>
+                            {% else %}
+                                <i class="fa fa-check-circle text-success"></i>
+                                <p class="text-success">{{ invoice.status }}</p>
+                            {% endif %}
+                            <form action="{% url 'shop:order_overview' %}" method="POST">
+                            {% csrf_token %}
+                                <input type="hidden" value="{{ invoice.id }}" name="invoice_id">
+                                <select name="order_status">
+                                    <option value="0" selected>------</option>
+                                    <option value="Confirmed">Confirmed</option>
+                                    <option value="Shipped">Shipped</option>
+                                    <option value="Delivered">Delivered</option>
+                                </select>
+                                <br />
+                                <button class="btn btn-primary mt-2">Change status</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    </div>
+
+{% endblock %}

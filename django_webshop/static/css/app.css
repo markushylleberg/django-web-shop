@@ -7,6 +7,11 @@
     max-width: 60px;
 }
 
+.very-small-img {
+    max-width: 30px;
+}
+
 .large-text {
     font-size: 28px;
+    font-weight: 400;
 }

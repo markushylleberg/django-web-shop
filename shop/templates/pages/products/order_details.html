@@ -7,7 +7,7 @@
         <a href="{% url 'shop:orders' %}"><-- back to orders</a>
         <br />
         <br />
-        <h1 class="text-secondary mx-3">Order #{{ order.id }}</h1>
+        <h1 class="text-secondary mx-3"><i>Order #{{ order.id }}</i></h1>
         <div class="row m-3">
             <div class="col-4 text-center border p-3">
                 <h3>Products you've ordered</h3>
@@ -24,7 +24,7 @@
                             <p>{{ order_product.product.product.title }}</p>
                         </div>
                         <div class="col-3">
-                            <p>{{ order_product.product.price }} kr.</p>
+                            <p>{{ order_product.total }} kr.</p>
                         </div>
                     </div>
                 {% endfor %}

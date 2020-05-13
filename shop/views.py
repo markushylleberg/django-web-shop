@@ -1,4 +1,6 @@
-from django.db.models import Q
+from collections import Counter
+
+from django.db.models import Q, Sum
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -461,3 +463,84 @@ def order_detail(req):
             print('User is not logged in')
 
     return render(req, 'pages/products/order_details.html', context)
+
+
+
+def order_overview(req):
+
+    context = {}
+
+    if req.user.is_authenticated and req.user.is_superuser:
+        
+        invoices = Invoice.objects.all()
+        invoice_products = InvoiceProduct.objects.all()
+
+        context = {
+            'invoices': invoices,
+            'invoice_products': invoice_products
+        }
+
+        if req.method == 'POST':
+            if req.POST['order_status'] == '0':
+                pass
+            else:
+                invoice_id = req.POST['invoice_id']
+                status = req.POST['order_status']
+                invoice = Invoice.objects.filter(id=invoice_id)[0]
+                invoice.status = status
+                invoice.save()
+                return render(req, 'pages/administator/order_overview.html', context)
+
+    else:
+        return HttpResponseRedirect(reverse('shop:index'))
+
+    return render(req, 'pages/administator/order_overview.html', context)
+
+
+
+def sales_overview(req):
+
+    context = {}
+
+    if req.user.is_authenticated and req.user.is_superuser:
+        
+        total_revenue = Invoice.objects.aggregate(sum=Sum('total_price'))
+        invoices = Invoice.objects.all()
+
+        invoice_products = InvoiceProduct.objects.all()
+
+        best_sellers = []
+
+        for invoice_product in invoice_products:
+            for i in range(invoice_product.quantity):
+                best_sellers.append(invoice_product.product.id)
+
+        counted_best_sellers = Counter(best_sellers)
+
+        top_3 = counted_best_sellers.most_common(3)
+
+        top_3_products = []
+        # top_3_products_list = []
+
+        for top in top_3:
+            product = ProductVariant.objects.filter(id=top[0])
+            obj = {'product': product, 'count': top[1], 'total': product[0].price*top[1]}
+            # top_3_products_list.append(top[0])
+            top_3_products.append(obj)
+
+        # top_3_products = ProductVariant.objects.filter(id__in=top_3_products_list)
+
+        print(top_3_products)
+        # print(top_3_products)
+
+        context = {
+            'total_revenue': total_revenue,
+            'total_invoices': len(invoices),
+            'best_seller_products': top_3_products,
+            # 'best_seller_products': top_3_products,
+        }
+
+    else:
+        return HttpResponseRedirect(reverse('shop:index'))
+
+    return render(req, 'pages/administator/sales_overview.html', context)

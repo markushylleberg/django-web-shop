@@ -24,8 +24,8 @@
                         <td>{{ order.transaction_datetime }}</td>
                         <td>{{ order.shipping_address }}</td>
                         <td>{{ order.shipping_method.shipping_method }}</td>
-                        <td>{{ order.total_price }}</td>
-                        <th scope="row" class="text-success">{{ order.status }}</th>
+                        <td>{{ order.total_price }} kr.</td>
+                        <th scope="row">{{ order.status }}</th>
                         <td>
                         <form action="{% url 'shop:order_detail' %}" method="POST">
                             {% csrf_token %}
