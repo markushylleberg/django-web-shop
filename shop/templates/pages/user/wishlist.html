@@ -2,12 +2,8 @@
 
 {% block content %}
 
-
-    <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item active"><a href={% url 'shop:index' %}>Home</a></li>
-    </ol>
-    </nav>
+    <div class="m-3">
+        <h1>Wishlist</h1>
 
         <div class="row m-3">
             {% for product_variant in product_variants %}
@@ -28,16 +24,21 @@
                             <div class="text-center">
                                 {% if product_variant.stock == 0  %}
                                     <h2 class="text-danger">SOLD OUT</h2>
+                                    <form class="mt-1" action="{% url 'shop:remove_from_wishlist' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
+                                        <button class="btn btn-danger"><i class="fa fa-times"></i> Remove</button>
+                                    </form>
                                 {% else %}
                                     <form action="{% url 'shop:product_detail' %}">
                                         <input type="hidden" value="{{ product_variant.product.id }}" name="product_id" />
                                         <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
                                         <button class="btn btn-secondary">See more</button>
                                     </form>
-                                    <form class="mt-1" action="{% url 'shop:add_to_wishlist' %}" method="POST">
+                                    <form class="mt-1" action="{% url 'shop:remove_from_wishlist' %}" method="POST">
                                         {% csrf_token %}
                                         <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
-                                        <button class="btn btn-primary">Add to wishlist</button>
+                                        <button class="btn btn-danger"><i class="fa fa-times"></i> Remove</button>
                                     </form>
                                 {% endif %}
                             </div>
@@ -45,5 +46,9 @@
                     </div>
             {% endfor %}
         </div>
+
+
+
+    </div>
 
 {% endblock %}

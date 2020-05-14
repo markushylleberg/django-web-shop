@@ -89,7 +89,7 @@ class Invoice(models.Model):
 
 
 class InvoiceProduct(models.Model):
-    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='invoice_products')
     product = models.ForeignKey(ProductVariant, on_delete=models.CASCADE) ## Should be PROTECT, but for development we'll keep it at CASCADE
     quantity = models.PositiveIntegerField()
 

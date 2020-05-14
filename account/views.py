@@ -1,8 +1,12 @@
+import django_rq
 from django.shortcuts import render, reverse
 from django.contrib.auth import authenticate, login as login_method, logout as logout_method
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
+
+from . messaging import new_password_req_email
 from . models import PasswordResetRequest, UserProfile
+
 
 def login(req):
 
@@ -149,14 +153,16 @@ def request_reset_password(req):
             new_request = PasswordResetRequest()
             new_request.email = email
             new_request.save()
-            print(new_request) ### This is what should be sent to the users email
+            django_rq.enqueue(new_password_req_email, {
+                'token': new_request.token,
+                'email': new_request.email,
+            })
             return HttpResponseRedirect(reverse('password_reset'))
 
         else:
             context = {
                 'message': 'The email does not exists in our system'
             }
-
 
     return render(req, 'request_reset_password.html', context)
 

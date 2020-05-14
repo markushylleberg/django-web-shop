@@ -1,3 +1,4 @@
+import django_rq
 from collections import Counter
 
 from django.db.models import Q, Sum
@@ -7,25 +8,19 @@ from django.shortcuts import render
 from django.utils.crypto import get_random_string
 from django.urls import reverse
 
+from . messaging import order_confirmation_email
 from .models import Product, ProductVariant, ProductAttribute, ProductAttributeOption, ProductCategory, UserProductVariantWishlist, UserProductVariantCart, ShippingMethod, Invoice, InvoiceProduct
 from account.models import UserProfile
 
 
 def index(req):
 
-    products = Product.objects.all()
-    product_variants = ProductVariant.objects.all()
-    product_attributes = ProductAttribute.objects.all()
-
-    product_variants_list = ProductVariant.objects.values_list('id', flat=True)
-    product_variants_currently_in_carts = UserProductVariantCart.objects.values_list('product_variant', flat=True)
-
+    product_variants = ProductVariant.objects.all().order_by('-product__title', '-stock')
 
     context = {
-        'products': products,
-        'product_variants': product_variants,
-        'product_attributes': product_attributes,
+        'product_variants': product_variants
     }
+    
     return render(req, 'pages/products/index.html', context)
 
 
@@ -46,9 +41,6 @@ def categories(req):
         category_product_variants = ProductVariant.objects.filter(product=category_products[0])
         category_title = ProductCategory.objects.filter(id=category_id)[0]
 
-        print(category_title)
-        # print(categories_list)
-
         context = {
             'category_products': category_products,
             'category_product_variants': category_product_variants,
@@ -64,7 +56,6 @@ def product_detail(req):
     product_id = req.GET['product_id']
     product_variant_id = req.GET['product_variant_id']
 
-    product = Product.objects.filter(id=product_id)[0]
     product_variant = ProductVariant.objects.filter(id=product_variant_id)[0]
     product_other_variants = ProductVariant.objects.filter(product=product_id)
     product_attributes = ProductAttribute.objects.filter(entity=product_variant_id)
@@ -77,7 +68,6 @@ def product_detail(req):
         total_amount_in_carts += product_variant_currently_in_cart
 
     context = {
-        'product': product,
         'product_variant': product_variant,
         'product_other_variants': product_other_variants,
         'product_attributes': product_attributes,
@@ -173,7 +163,7 @@ def cart(req):
             'cart_total': cart_total
         }
     
-    return render(req, 'pages/products/cart.html', context)
+    return render(req, 'pages/checkout/cart.html', context)
 
 
 def add_to_cart(req):
@@ -289,24 +279,30 @@ def add_to_wishlist(req):
 
 
 @login_required(login_url='/account/login/')
+def remove_from_wishlist(req):
+
+    if req.method == 'POST':
+        product_variant_id = req.POST['product_variant_id']
+
+        product_variant_from_wishlist = UserProductVariantWishlist.objects.filter(Q(product_variant=product_variant_id), Q(user=req.user))[0]
+        product_variant_from_wishlist.delete()
+
+    return HttpResponseRedirect(reverse('shop:wishlist'))
+
+
+@login_required(login_url='/account/login/')
 def wishlist(req):
 
-    ## Users products and product variants on his/hers wishlist
-    wishlist_product_list = list(UserProductVariantWishlist.objects.filter(user=req.user).values_list('product_variant__product_id', flat=True))
+    ## Users product variants on his/hers wishlist
     wishlist_product_variants_list = list(UserProductVariantWishlist.objects.filter(user=req.user).values_list('product_variant', flat=True))
 
-    ## Instances of products and product variants
-    products = Product.objects.filter(id__in=wishlist_product_list)
+    ## Instances of product variants
     product_variants = ProductVariant.objects.filter(id__in=wishlist_product_variants_list)
 
-    print(products)
-    print(product_variants)
-
     context = {
-        'products': products,
         'product_variants': product_variants
     }
-    return render(req, 'pages/products/wishlist.html', context)
+    return render(req, 'pages/user/wishlist.html', context)
 
 
 def checkout(req):
@@ -334,7 +330,7 @@ def checkout(req):
     else:
         print('we need to show the cart products from a cookie from a unauthenticated user')
 
-    return render(req, 'pages/products/checkout.html', context)
+    return render(req, 'pages/checkout/checkout.html', context)
 
 
 def confirm_order(req):
@@ -373,7 +369,7 @@ def confirm_order(req):
         'user_profile': user_data
     }
 
-    return render(req, 'pages/products/confirm_order.html', context)
+    return render(req, 'pages/checkout/confirm_order.html', context)
 
 
 def confirmation(req):
@@ -418,6 +414,13 @@ def confirmation(req):
                 product.stock -= cart_product.quantity
                 product.save()
 
+            ## Send confirmation email to user
+            django_rq.enqueue(order_confirmation_email, {
+                'order_id': new_invoice.id,
+                'order_total': cart_total,
+                'email': email,
+            })
+
             ## Empty the cart
             cart = UserProductVariantCart.objects.filter(user=user)
             cart.delete()
@@ -429,7 +432,7 @@ def confirmation(req):
         'email': email
     }
 
-    return render(req, 'pages/products/confirmation.html', context)
+    return render(req, 'pages/checkout/confirmation.html', context)
 
 
 def orders(req):
@@ -439,7 +442,7 @@ def orders(req):
     context = {
         'orders': orders
     }
-    return render(req, 'pages/products/my_orders.html', context)
+    return render(req, 'pages/user/my_orders.html', context)
 
 
 def order_detail(req):
@@ -462,7 +465,7 @@ def order_detail(req):
         else:
             print('User is not logged in')
 
-    return render(req, 'pages/products/order_details.html', context)
+    return render(req, 'pages/user/order_details.html', context)
 
 
 
@@ -506,8 +509,8 @@ def sales_overview(req):
         
         total_revenue = Invoice.objects.aggregate(sum=Sum('total_price'))
         invoices = Invoice.objects.all()
-
         invoice_products = InvoiceProduct.objects.all()
+        sold_out_product_variants = ProductVariant.objects.filter(stock=0)
 
         best_sellers = []
 
@@ -520,24 +523,17 @@ def sales_overview(req):
         top_3 = counted_best_sellers.most_common(3)
 
         top_3_products = []
-        # top_3_products_list = []
 
         for top in top_3:
             product = ProductVariant.objects.filter(id=top[0])
             obj = {'product': product, 'count': top[1], 'total': product[0].price*top[1]}
-            # top_3_products_list.append(top[0])
             top_3_products.append(obj)
-
-        # top_3_products = ProductVariant.objects.filter(id__in=top_3_products_list)
-
-        print(top_3_products)
-        # print(top_3_products)
 
         context = {
             'total_revenue': total_revenue,
             'total_invoices': len(invoices),
             'best_seller_products': top_3_products,
-            # 'best_seller_products': top_3_products,
+            'sold_out_product_variants': sold_out_product_variants
         }
 
     else:

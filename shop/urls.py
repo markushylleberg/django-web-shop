@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import path
+from django.urls import path, include
 from . import views
+from .api import InvoiceListAll, InvoiceListConfirmed, InvoiceListShipped, InvoiceDetail
 
 app_name = 'shop'
 
@@ -23,5 +24,13 @@ urlpatterns = [
     path('sales_overview', views.sales_overview, name='sales_overview'),
     path('search/', views.search, name='search'),
     path('remove_product_from_cart/', views.remove_product_from_cart, name='remove_product_from_cart'),
+    path('remove_from_wishlist', views.remove_from_wishlist, name='remove_from_wishlist'),
     path('wishlist/', views.wishlist, name='wishlist'),
+
+    ## Invoices API
+    path('api/invoices/', InvoiceListAll.as_view()),
+    path('api/invoices/confirmed/', InvoiceListConfirmed.as_view()),
+    path('api/invoices/shipped/', InvoiceListShipped.as_view()),
+    path('api/invoices/<int:pk>/', InvoiceDetail),
+    path('api/invoices/rest-auth/', include('rest_auth.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

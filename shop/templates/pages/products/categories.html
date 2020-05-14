@@ -6,9 +6,7 @@
             <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href={% url 'shop:index' %}>Home</a></li>
-                {% if categories %}
-                    <li class="breadcrumb-item active" aria-current="page">Categories</li>
-                {% endif %}
+                <li class="breadcrumb-item active" aria-current="page">Categories</li>
             </ol>
             </nav>
         {% else %}
@@ -16,7 +14,7 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href={% url 'shop:index' %}>Home</a></li>
                 <li class="breadcrumb-item"><a href={% url 'shop:categories' %}>Categories</a></li>
-                {% if category_products %}
+                {% if category_product_variants %}
                     <li class="breadcrumb-item active">{{ category_title }}</li>
                 {% endif %}
             </ol>
@@ -24,70 +22,58 @@
         {% endif %}
 
         <h1 class="mx-5">{{ category_title }}</h1>
-    <div class="m-3 row">
+        <div class="m-3 row">
 
-        {% if categories %}
-            {% for category in categories %}
-                <div class="col-12 my-5 py-5 text-center border border-primary">
-                    <form action="{% url 'shop:categories' %}" method="POST">
-                    {% csrf_token %}
-                    <input type="hidden" value={{ category.id }} name="category_id" />
-                    <button>
-                        <h1>{{ category.category }}</h1>
-                    </button>
-                    </form>
-                </div>
-            {% endfor %}
-        {% endif %}
+            {% if categories %}
+                {% for category in categories %}
+                    <div class="col-12 my-5 py-5 text-center border border-primary">
+                        <form action="{% url 'shop:categories' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" value={{ category.id }} name="category_id" />
+                        <button>
+                            <h1>{{ category.category }}</h1>
+                        </button>
+                        </form>
+                    </div>
+                {% endfor %}
+            {% endif %}
 
-        {% if category_products %}
-
-
+            {% if category_products %}
                 {% for category_product_variant in category_product_variants %}
-                        <div class="card col-lg-3 col-md-4 col-sm-6 col-xs-12">
-                            <img class="card-img-top img-fluid" style="max-height: 15em" src="{{ category_product_variant.image.url }}" alt={{ product.title }}>
-                            <div class="card-body">
-                                <h5 class="card-title">{{ category_title }}</h5>
-                                <p class="card-text">{{ category_product_variant.price }} kr.</p>
-
-                                {% for product_attribute in product_attributes %}
-                                    {% if product_attribute|stringformat:"s" == product_variant.id|stringformat:"s" %}
-                                        <p>Size: {{ product_attribute.value }}</p>
-                                    {% endif %}
-                                {% endfor %}
-
+                    <div class="card col-lg-3 col-md-4 col-sm-6 col-xs-12 p-5">
+                    {% if category_product_variant.stock == 0  %}
+                            <img class="card-img-top img-fluid disabled" src="{{ MEDIA_URL }} {{ category_product_variant.image.url }}" alt="Image of {{ category_product_variant.product.title }}">
+                    {% else %}
+                            <img class="card-img-top img-fluid" src="{{ MEDIA_URL }} {{ category_product_variant.image.url }}" alt="Image of {{ category_product_variant.product.title }}">
+                    {% endif %}
+                            <div class="card-body text-center">
+                                {% if category_product_variant.stock == 0  %}
+                                    <h5 class="card-title disabled">{{ category_product_variant.product.title }}</h5>
+                                    <p class="card-text disabled">{{ category_product_variant.price }} kr.</p>
+                                {% else %}
+                                    <h5 class="card-title">{{ category_product_variant.product.title }}</h5>
+                                    <p class="card-text">{{ category_product_variant.price }} kr.</p>
+                                {% endif %}
                                 <div class="text-center">
-                                    <form action="{% url 'shop:product_detail' %}">
-                                    {% for category_product in category_products %}
-                                        {% if category_product.id|stringformat:"s" == category_product_variant.product|stringformat:"s" %}
-                                            <input type="hidden" value="{{ category_product.id }}" name="product_id" />
-                                        {% endif %}
-                                    {% endfor %}
-                                        <input type="hidden" value="{{ category_product_variant.id }}" name="product_variant_id" />
-                                        <button class="btn btn-secondary">See more</button>
-                                    </form>
-                                    <div class="mt-1">
-                                        <form action="{% url 'shop:add_to_wishlist' %}" method="POST">
-                                            {% csrf_token %}
-                                            <input type="hidden" value="1" name="quantity" />
+                                    {% if category_product_variant.stock == 0  %}
+                                        <h2 class="text-danger">SOLD OUT</h2>
+                                    {% else %}
+                                        <form action="{% url 'shop:product_detail' %}">
+                                            <input type="hidden" value="{{ category_product_variant.product.id }}" name="product_id" />
                                             <input type="hidden" value="{{ category_product_variant.id }}" name="product_variant_id" />
+                                            <button class="btn btn-secondary">See more</button>
+                                        </form>
+                                        <form class="mt-1" action="{% url 'shop:add_to_wishlist' %}" method="POST">
+                                            {% csrf_token %}
+                                            <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
                                             <button class="btn btn-primary">Add to wishlist</button>
                                         </form>
-                                    </div>
-                                    {% comment %} <div class="mt-1">
-                                        <form action="{% url 'shop:add_to_cart' %}" method="POST">
-                                            {% csrf_token %}
-                                            <input type="hidden" value="1" name="quantity" />
-                                            <input type="hidden" value={{ category_product_variant.id }} name="product_variant_id" />
-                                            <button class="btn btn-primary">Add to cart</button>
-                                        </form>
-                                    </div> {% endcomment %}
+                                    {% endif %}
                                 </div>
                             </div>
-                        </div>
+                    </div>
                 {% endfor %}
-
-        {% endif %}
-    </div>
+            {% endif %}
+        </div>
 
 {% endblock %}
