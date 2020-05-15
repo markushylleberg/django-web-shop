@@ -8,6 +8,7 @@ from . messaging import new_password_req_email
 from . models import PasswordResetRequest, UserProfile
 
 
+
 def login(req):
 
     if req.user.is_authenticated: ### Check if user is already logged in
@@ -30,14 +31,16 @@ def login(req):
             
     return render(req, 'login.html', context)
 
+
+
 def logout(req):
+
     logout_method(req)
     return HttpResponseRedirect(reverse('shop:index'))
 
-def signup(req):
 
-    # if req.user.is_authenticated: ### Check if user is already logged in
-    #     return HttpResponseRedirect(reverse('shop:index'))
+
+def signup(req):
 
     context = {}
     if req.method == 'POST':
@@ -67,6 +70,8 @@ def signup(req):
                 'message': 'Passwords did not match.'
             }
     return render(req, 'signup.html', context)
+
+
 
 def account_settings(req):
 

@@ -3,17 +3,17 @@
 {% block content %}
 
         {% if categories %}
-            <nav aria-label="breadcrumb">
+            <nav class="space-for-nav px-3" aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href={% url 'shop:index' %}>Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Categories</li>
+                <li class="breadcrumb-item active"><a style="color: #6c757d!important; pointer-events: none" href={% url 'shop:index' %}>Categories</a></li>
             </ol>
             </nav>
         {% else %}
-            <nav aria-label="breadcrumb">
+            <nav class="space-for-nav px-3" aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href={% url 'shop:index' %}>Home</a></li>
-                <li class="breadcrumb-item"><a href={% url 'shop:categories' %}>Categories</a></li>
+                <li class="breadcrumb-item active"><a href={% url 'shop:categories' %}>Categories</a></li>
                 {% if category_product_variants %}
                     <li class="breadcrumb-item active">{{ category_title }}</li>
                 {% endif %}
@@ -21,17 +21,24 @@
             </nav>
         {% endif %}
 
-        <h1 class="mx-5">{{ category_title }}</h1>
-        <div class="m-3 row">
+        {% if categories %}
+            <h1 class="mx-4 dws-blue">Categories</h1>
+        {% else %}
+            <h1 class="mx-5 dws-blue">{{ category_title }}</h1>
+        {% endif %}
 
+        <div class="m-3 px-3 row">
             {% if categories %}
                 {% for category in categories %}
-                    <div class="col-12 my-5 py-5 text-center border border-primary">
+                    <div class="col-12 my-1 p-4 text-left">
                         <form action="{% url 'shop:categories' %}" method="POST">
                         {% csrf_token %}
                         <input type="hidden" value={{ category.id }} name="category_id" />
-                        <button>
-                            <h1>{{ category.category }}</h1>
+                        <button class="w-100 dws-blue category-btn icon-btn">
+                            <div class="w-100">
+                                <h1>{{ category.category }}s</h1>
+                                <p>{{ category.category_desc }}</p>
+                            </div>
                         </button>
                         </form>
                     </div>
@@ -40,39 +47,47 @@
 
             {% if category_products %}
                 {% for category_product_variant in category_product_variants %}
-                    <div class="card col-lg-3 col-md-4 col-sm-6 col-xs-12 p-5">
-                    {% if category_product_variant.stock == 0  %}
-                            <img class="card-img-top img-fluid disabled" src="{{ MEDIA_URL }} {{ category_product_variant.image.url }}" alt="Image of {{ category_product_variant.product.title }}">
-                    {% else %}
-                            <img class="card-img-top img-fluid" src="{{ MEDIA_URL }} {{ category_product_variant.image.url }}" alt="Image of {{ category_product_variant.product.title }}">
-                    {% endif %}
-                            <div class="card-body text-center">
-                                {% if category_product_variant.stock == 0  %}
-                                    <h5 class="card-title disabled">{{ category_product_variant.product.title }}</h5>
-                                    <p class="card-text disabled">{{ category_product_variant.price }} kr.</p>
-                                {% else %}
-                                    <h5 class="card-title">{{ category_product_variant.product.title }}</h5>
-                                    <p class="card-text">{{ category_product_variant.price }} kr.</p>
-                                {% endif %}
-                                <div class="text-center">
-                                    {% if category_product_variant.stock == 0  %}
-                                        <h2 class="text-danger">SOLD OUT</h2>
-                                    {% else %}
-                                        <form action="{% url 'shop:product_detail' %}">
-                                            <input type="hidden" value="{{ category_product_variant.product.id }}" name="product_id" />
-                                            <input type="hidden" value="{{ category_product_variant.id }}" name="product_variant_id" />
-                                            <button class="btn btn-secondary">See more</button>
-                                        </form>
-                                        <form class="mt-1" action="{% url 'shop:add_to_wishlist' %}" method="POST">
-                                            {% csrf_token %}
-                                            <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
-                                            <button class="btn btn-primary">Add to wishlist</button>
-                                        </form>
-                                    {% endif %}
-                                </div>
+                    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                        {% if category_product_variant.stock == 0  %}
+                        <div class="card index-card p-2">
+                            <div class="p-4">
+                                <img class="card-img-top img-fluid disabled" style="max-height: 20em; object-fit: cover;" src="{{ MEDIA_URL }} {{ category_product_variant.image.url }}" alt="Image of {{ category_product_variant.product.title }}">
                             </div>
-                    </div>
+                        {% else %}
+                            <div class="card index-card p-2">
+                                <div class="p-4">
+                                    <img class="card-img-top img-fluid" style="max-height: 20em; object-fit: cover;" src="{{ MEDIA_URL }} {{ category_product_variant.image.url }}" alt="Image of {{ category_product_variant.product.title }}">
+                                </div>
+                        {% endif %}
+                                <div class="card-body text-center">
+                                    {% if category_product_variant.stock == 0  %}
+                                        <h5 class="card-title disabled">{{ category_product_variant.product.title }}</h5>
+                                        <p class="card-text disabled">{{ category_product_variant.price }} kr.</p>
+                                    {% else %}
+                                        <p class="card-title">{{ category_product_variant.product.title }}</p>
+                                        <h4 class="card-text">{{ category_product_variant.price }} kr.</h4>
+                                    {% endif %}
+                                    <div class="text-center">
+                                        {% if category_product_variant.stock == 0  %}
+                                            <p class="text-danger"><b>SOLD OUT</b></p>
+                                        {% else %}
+                                            <form action="{% url 'shop:product_detail' %}">
+                                                <input type="hidden" value="{{ category_product_variant.product.id }}" name="product_id" />
+                                                <input type="hidden" value="{{ category_product_variant.id }}" name="product_variant_id" />
+                                                <button class="btn btn-primary">View product</button>
+                                            </form>
+                                            <form class="mt-1" action="{% url 'shop:add_to_wishlist' %}" method="POST">
+                                                {% csrf_token %}
+                                                <input type="hidden" value="{{ category_product_variant.id }}" name="product_variant_id" />
+                                                <button class="icon-btn"><i class="fa fa-heart dws-blue"></i></button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>´
+                        </div>
                 {% endfor %}
+                    </div>
             {% endif %}
         </div>
 

@@ -2,17 +2,17 @@
 
 {% block content %}
 
-    <div class="m-3">
-        <h1 class="text-center">Sales dashboard</h1>
-        <hr />
-        <div class="py-2">
-            <h4 class="px-2 text-info"><i class="fa fa-circle text-info"></i> Sales overview</h4>
+    <div class="p-3 space-for-nav">
+        <h1 class="dws-blue">Sale overview</h1>
+        <div class="dws-line w-100 my-3"></div>
+        <div class="m-4">
+            <h4 class="px-2 dws-blue">Sales overview</h4>
             <p class="large-text"><i>Total orders:</i><b> {{ total_invoices }} </b></p>
             <p class="large-text"><i>Total revenue:</i><span class="text-success"><b> {{ total_revenue.sum }} kr.</b></span></p>
         </div>
-        <hr />
-        <div class="py-2">
-            <h4 class="px-2 text-info"><i class="fa fa-circle text-info"></i> Top 3 best selling products</h4>
+        <br />
+        <div class="m-4">
+            <h4 class="px-2 dws-blue">Top 3 best selling products</h4>
                 {% for best_seller_product in best_seller_products %}
                     {% for product in best_seller_product.product %}
                     <div class="d-flex p-3 my-3 border">
@@ -29,9 +29,9 @@
                     {% endfor %}
                 {% endfor %}
         </div>
-        <hr />
-        <div class="py-2">
-            <h4 class="px-2 text-info"><i class="fa fa-circle text-info"></i> Items that has sold out</h4>
+        <br />
+        <div class="m-4">
+            <h4 class="px-2 dws-blue">Items that has sold out</h4>
             {% for sold_out_product_variant in sold_out_product_variants %}
                 <div class="d-flex p-3 my-3 border">
                     <p class="p-3"><b>{{ sold_out_product_variant.product.title }}</b></p>
@@ -42,7 +42,6 @@
                 </div>
             {% endfor %}
         </div>
-        <hr />
     </div>
 
 {% endblock %}

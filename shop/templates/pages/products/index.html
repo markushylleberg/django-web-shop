@@ -3,47 +3,53 @@
 {% block content %}
 
 
-    <nav aria-label="breadcrumb">
+    <nav class="space-for-nav px-3" aria-label="breadcrumb">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item active"><a href={% url 'shop:index' %}>Home</a></li>
+        <li class="breadcrumb-item"><a style="color: #6c757d!important; pointer-events: none" href={% url 'shop:index' %}>Home</a></li>
     </ol>
     </nav>
-
         <div class="row m-3">
             {% for product_variant in product_variants %}
-                    <div class="card col-lg-3 col-md-4 col-sm-6 col-xs-12 p-5">
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                     {% if product_variant.stock == 0  %}
-                        <img class="card-img-top img-fluid disabled" src="{{ MEDIA_URL }} {{ product_variant.image.url }}" alt="Image of {{ product_variant.product.title }}">
-                    {% else %}
-                        <img class="card-img-top img-fluid" src="{{ MEDIA_URL }} {{ product_variant.image.url }}" alt="Image of {{ product_variant.product.title }}">
-                    {% endif %}
-                        <div class="card-body text-center">
-                            {% if product_variant.stock == 0  %}
-                                <h5 class="card-title disabled">{{ product_variant.product.title }}</h5>
-                                <p class="card-text disabled">{{ product_variant.price }} kr.</p>
-                            {% else %}
-                                <h5 class="card-title">{{ product_variant.product.title }}</h5>
-                                <p class="card-text">{{ product_variant.price }} kr.</p>
-                            {% endif %}
-                            <div class="text-center">
-                                {% if product_variant.stock == 0  %}
-                                    <h2 class="text-danger">SOLD OUT</h2>
-                                {% else %}
-                                    <form action="{% url 'shop:product_detail' %}">
-                                        <input type="hidden" value="{{ product_variant.product.id }}" name="product_id" />
-                                        <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
-                                        <button class="btn btn-secondary">See more</button>
-                                    </form>
-                                    <form class="mt-1" action="{% url 'shop:add_to_wishlist' %}" method="POST">
-                                        {% csrf_token %}
-                                        <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
-                                        <button class="btn btn-primary">Add to wishlist</button>
-                                    </form>
-                                {% endif %}
-                            </div>
+                    <div class="card index-card p-2">
+                        <div class="p-4">
+                            <img class="card-img-top img-fluid disabled" style="max-height: 20em; object-fit: cover;" src="{{ MEDIA_URL }} {{ product_variant.image.url }}" alt="Image of {{ product_variant.product.title }}">
                         </div>
+                    {% else %}
+                        <div class="card index-card p-2">
+                            <div class="p-4">
+                                <img class="card-img-top img-fluid" style="max-height: 20em; object-fit: cover;" src="{{ MEDIA_URL }} {{ product_variant.image.url }}" alt="Image of {{ product_variant.product.title }}">
+                            </div>
+                    {% endif %}
+                            <div class="card-body text-center">
+                                {% if product_variant.stock == 0  %}
+                                    <h5 class="card-title disabled">{{ product_variant.product.title }}</h5>
+                                    <p class="card-text disabled">{{ product_variant.price }} kr.</p>
+                                {% else %}
+                                    <p class="card-title">{{ product_variant.product.title }}</p>
+                                    <h4 class="card-text">{{ product_variant.price }} kr.</h4>
+                                {% endif %}
+                                <div class="text-center">
+                                    {% if product_variant.stock == 0  %}
+                                        <p class="text-danger"><b>SOLD OUT</b></p>
+                                    {% else %}
+                                        <form action="{% url 'shop:product_detail' %}">
+                                            <input type="hidden" value="{{ product_variant.product.id }}" name="product_id" />
+                                            <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
+                                            <button class="btn btn-primary">View product</button>
+                                        </form>
+                                        <form class="mt-1" action="{% url 'shop:add_to_wishlist' %}" method="POST">
+                                            {% csrf_token %}
+                                            <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
+                                            <button class="icon-btn"><i class="fa fa-heart dws-blue"></i></button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>´
                     </div>
-            {% endfor %}
-        </div>
+                {% endfor %}
+                </div>
 
 {% endblock %}

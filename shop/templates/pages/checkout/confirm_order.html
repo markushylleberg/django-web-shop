@@ -2,9 +2,9 @@
 
 {% block content %}
 
-    <div class="m-4">
-        <h1>Confirm order</h1>
-        <a href="{% url 'shop:checkout' %}"><-- Back to order details</a>
+    <div class="space-for-nav p-4">
+        <h1 class="mx-4 dws-blue">Checkout <i class="fa fa-check"></i></h1>
+        <a class="icon-btn dws-blue mx-4" href="{% url 'shop:checkout' %}"><i class="fa fa-arrow-left"></i> Back to order details</a>
             <table class="table">
             <thead>
                 <tr>
@@ -27,33 +27,39 @@
         {% endfor %}
             </tbody>
             </table>
-        <div class="confirm-container text-center px-5">
-            <h4>Delivery information</h4>
+        <div class="confirm-container px-5 row">
+            <div class="col-4 p-5">
+                <h4>Delivery information</h4>
                 <p><i>Name:</i> {{ user_profile.first_name }} {{ user_profile.last_name }}</p>
                 <p><i>Address:</i> {{ user_profile.address }} {{ user_profile.city }}, {{ user_profile.country }}</p>
                 <p><i>Phone:</i> {{ user_profile.phone }}</p>
-            <hr />
-            <h4>Shipping information</h4>
-            {% if shipping.id == 2 %}
-                <p>Shipping method: <b>{{ shipping }}</b> to <b>{{ user_profile.address }}</b></p>
-            {% else %}
-                <p>Shipping method: <b>{{ shipping }}</b> to <b>the shop neareast you</b></p>
-            {% endif %}
-            <hr />
-            <h4>Order total</h4>
-            <p>Cart: <b>{{ cart_total }} kr.</b></p>
-            <p>+ Shipping: <b>{{ shipping.price }} kr.</b></p>
-            <p class="large-text">Total price: <b><u>{{ cart_total|add:shipping.price }} kr.</u></b></p>
-            <p>We will send a confirmation mail to <i><u>{{ user.email }}</u></i></p>
-            <form action="{% url 'shop:confirmation' %}" method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="confirm_address" value="{{ user_profile.address }}" />
-                <input type="hidden" name="confirm_city" value="{{ user_profile.city }}" />
-                <input type="hidden" name="confirm_country" value="{{ user_profile.country }}" />
-                <input type="hidden" name="confirm_shipping_method" value="{{ shipping.id }}" />
-                <input type="hidden" name="confirm_email" value="{{ user.email }}" />
-                <button class="btn btn-primary">PLACE ORDER</button>
-            </form>
+            </div>
+            <div class="col-4 p-5">
+                <h4>Shipping information</h4>
+                {% if shipping.id == 2 %}
+                    <p>Shipping method: <b>{{ shipping }}</b> to <b>{{ user_profile.address }}</b></p>
+                {% else %}
+                    <p>Shipping method: <b>{{ shipping }}</b> to <b>the shop neareast you</b></p>
+                {% endif %}
+            </div>
+            <div class="col-4 p-3 text-right border">
+                <h2>Order total</h2>
+                <p class="my-3">Cart: <b>{{ cart_total }} kr.</b></p>
+                <p class="my-3">+ Shipping: <b>{{ shipping.price }} kr.</b></p>
+                <div class="dws-line w-100 my-2"></div>
+                <p class="large-text">Total price: <b>{{ cart_total|add:shipping.price }} kr.</b></p>
+                <div class="dws-line w-100 my-2"></div>
+                <p>We will send a confirmation mail to <i><u>{{ user.email }}</u></i></p>
+                <form action="{% url 'shop:confirmation' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="confirm_address" value="{{ user_profile.address }}" />
+                    <input type="hidden" name="confirm_city" value="{{ user_profile.city }}" />
+                    <input type="hidden" name="confirm_country" value="{{ user_profile.country }}" />
+                    <input type="hidden" name="confirm_shipping_method" value="{{ shipping.id }}" />
+                    <input type="hidden" name="confirm_email" value="{{ user.email }}" />
+                    <button class="btn btn-primary">PLACE ORDER <i class="fa fa-check"></i></button>
+                </form>
+            </div>
         </div>
     </div>
 

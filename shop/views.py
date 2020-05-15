@@ -28,7 +28,7 @@ def index(req):
 def categories(req):
     
     categories_list = Product.objects.values_list('category', flat=True).distinct()
-    categories = ProductCategory.objects.filter(id__in=categories_list)
+    categories = ProductCategory.objects.filter(id__in=categories_list).order_by('category')
 
     context = {
         'categories': categories
@@ -137,32 +137,26 @@ def search(req):
 
 def cart(req):
 
-    context = {}
+    cart_products = list(UserProductVariantCart.objects.filter(user=req.user).values_list('product_variant', flat=True))
 
-    if req.user.is_authenticated:
-        cart_products = list(UserProductVariantCart.objects.filter(user=req.user).values_list('product_variant', flat=True))
+    cart_product_quantity = UserProductVariantCart.objects.filter(user=req.user)
 
-        cart_product_quantity = UserProductVariantCart.objects.filter(user=req.user)
+    product_variants = ProductVariant.objects.filter(id__in=cart_products)
 
-        product_variants = ProductVariant.objects.filter(id__in=cart_products)
+    product_variants_list = ProductVariant.objects.filter(id__in=cart_products).values_list('product_id', flat=True)
 
+    cart_total = 0
 
-        product_variants_list = ProductVariant.objects.filter(id__in=cart_products).values_list('product_id', flat=True)
-        products = Product.objects.filter(id__in=product_variants_list)
+    for item in cart_product_quantity:
+        cart_total += item.total()
 
-        cart_total = 0
+    context = {
+        'cart_product_quantities': cart_product_quantity,
+        'cart_products': cart_products,
+        'product_variants': product_variants,
+        'cart_total': cart_total
+    }
 
-        for item in cart_product_quantity:
-            cart_total += item.total()
-
-        context = {
-            'cart_product_quantities': cart_product_quantity,
-            'cart_products': cart_products,
-            'product_variants': product_variants,
-            'products': products,
-            'cart_total': cart_total
-        }
-    
     return render(req, 'pages/checkout/cart.html', context)
 
 
@@ -174,21 +168,18 @@ def add_to_cart(req):
         ## Check if item is in database and in the requested stock amount
         is_product_available = ProductVariant.objects.filter(Q(id=product_variant_id), Q(stock__gte=quantity)).exists()
         if is_product_available:
-            if req.user.is_authenticated:
-                product_already_in_cart = UserProductVariantCart.objects.filter(Q(user=req.user), Q(product_variant=product_variant_id))
-                if product_already_in_cart:
-                    product_already_in_cart[0].quantity += int(quantity)
-                    product_already_in_cart[0].save()
-                else:
-                    product = ProductVariant.objects.filter(id=product_variant_id)[0]
-                    user = req.user
-                    new_cart_product = UserProductVariantCart()
-                    new_cart_product.product_variant = product
-                    new_cart_product.quantity = quantity
-                    new_cart_product.user = user
-                    new_cart_product.save()
+            product_already_in_cart = UserProductVariantCart.objects.filter(Q(user=req.user), Q(product_variant=product_variant_id))
+            if product_already_in_cart:
+                product_already_in_cart[0].quantity += int(quantity)
+                product_already_in_cart[0].save()
             else:
-                print('User is NOT logged in. We need to store this cart item someplace')
+                product = ProductVariant.objects.filter(id=product_variant_id)[0]
+                user = req.user
+                new_cart_product = UserProductVariantCart()
+                new_cart_product.product_variant = product
+                new_cart_product.quantity = quantity
+                new_cart_product.user = user
+                new_cart_product.save()
         else:
             print('Something went wrong - product is not available in that quantity!')
     
@@ -471,31 +462,31 @@ def order_detail(req):
 
 def order_overview(req):
 
-    context = {}
+    # context = {}
 
-    if req.user.is_authenticated and req.user.is_superuser:
+    # if req.user.is_authenticated and req.user.is_superuser:
         
-        invoices = Invoice.objects.all()
-        invoice_products = InvoiceProduct.objects.all()
+    invoices = Invoice.objects.all()
+    invoice_products = InvoiceProduct.objects.all()
 
-        context = {
-            'invoices': invoices,
-            'invoice_products': invoice_products
-        }
+    context = {
+        'invoices': invoices,
+        'invoice_products': invoice_products
+    }
 
-        if req.method == 'POST':
-            if req.POST['order_status'] == '0':
-                pass
-            else:
-                invoice_id = req.POST['invoice_id']
-                status = req.POST['order_status']
-                invoice = Invoice.objects.filter(id=invoice_id)[0]
-                invoice.status = status
-                invoice.save()
-                return render(req, 'pages/administator/order_overview.html', context)
+    if req.method == 'POST':
+        if req.POST['order_status'] == '0':
+            pass
+        else:
+            invoice_id = req.POST['invoice_id']
+            status = req.POST['order_status']
+            invoice = Invoice.objects.filter(id=invoice_id)[0]
+            invoice.status = status
+            invoice.save()
+            return render(req, 'pages/administator/order_overview.html', context)
 
-    else:
-        return HttpResponseRedirect(reverse('shop:index'))
+    # else:
+    #     return HttpResponseRedirect(reverse('shop:index'))
 
     return render(req, 'pages/administator/order_overview.html', context)
 
@@ -503,40 +494,40 @@ def order_overview(req):
 
 def sales_overview(req):
 
-    context = {}
+    # context = {}
 
-    if req.user.is_authenticated and req.user.is_superuser:
+    # if req.user.is_authenticated and req.user.is_superuser:
         
-        total_revenue = Invoice.objects.aggregate(sum=Sum('total_price'))
-        invoices = Invoice.objects.all()
-        invoice_products = InvoiceProduct.objects.all()
-        sold_out_product_variants = ProductVariant.objects.filter(stock=0)
+    total_revenue = Invoice.objects.aggregate(sum=Sum('total_price'))
+    invoices = Invoice.objects.all()
+    invoice_products = InvoiceProduct.objects.all()
+    sold_out_product_variants = ProductVariant.objects.filter(stock=0)
 
-        best_sellers = []
+    best_sellers = []
 
-        for invoice_product in invoice_products:
-            for i in range(invoice_product.quantity):
-                best_sellers.append(invoice_product.product.id)
+    for invoice_product in invoice_products:
+        for i in range(invoice_product.quantity):
+            best_sellers.append(invoice_product.product.id)
 
-        counted_best_sellers = Counter(best_sellers)
+    counted_best_sellers = Counter(best_sellers)
 
-        top_3 = counted_best_sellers.most_common(3)
+    top_3 = counted_best_sellers.most_common(3)
 
-        top_3_products = []
+    top_3_products = []
 
-        for top in top_3:
-            product = ProductVariant.objects.filter(id=top[0])
-            obj = {'product': product, 'count': top[1], 'total': product[0].price*top[1]}
-            top_3_products.append(obj)
+    for top in top_3:
+        product = ProductVariant.objects.filter(id=top[0])
+        obj = {'product': product, 'count': top[1], 'total': product[0].price*top[1]}
+        top_3_products.append(obj)
 
-        context = {
-            'total_revenue': total_revenue,
-            'total_invoices': len(invoices),
-            'best_seller_products': top_3_products,
-            'sold_out_product_variants': sold_out_product_variants
-        }
+    context = {
+        'total_revenue': total_revenue,
+        'total_invoices': len(invoices),
+        'best_seller_products': top_3_products,
+        'sold_out_product_variants': sold_out_product_variants
+    }
 
-    else:
-        return HttpResponseRedirect(reverse('shop:index'))
+    # else:
+    #     return HttpResponseRedirect(reverse('shop:index'))
 
     return render(req, 'pages/administator/sales_overview.html', context)

@@ -14,8 +14,8 @@
 
     {% if user.is_authenticated %}
         {% if user.is_superuser %}
-            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-                <a class="navbar-brand" href={% url 'shop:index' %}>Django Webshop</a>
+            <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-dark brand px-3">
+                <a class="navbar-brand" href={% url 'shop:index' %}><p class="brand-slogan"><b>Django</b> Web Shop <span class="very-small-text ml-2">Hi {{ user.first_name }}!</span></p></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -29,7 +29,7 @@
                             <a class="nav-link" href={% url 'shop:categories' %}>Categories <span class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href={% url 'shop:search' %}>Search Products<span class="sr-only">(current)</span></a>
+                            <a class="nav-link" href={% url 'shop:search' %}>Search <span class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -46,7 +46,7 @@
                             </div>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href={% url 'shop:wishlist' %}>Wishlist<span class="sr-only">(current)</span></a>
+                            <a class="nav-link" href={% url 'shop:wishlist' %}><i class="fa fa-gift"></i> Wishlist<span class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href={% url 'shop:cart' %}><i class="fa fa-shopping-cart"></i> Cart<span class="sr-only">(current)</span></a>
@@ -55,8 +55,8 @@
                 </div>
             </nav>
         {% else %}
-            <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-                <a class="navbar-brand" href={% url 'shop:index' %}>Django Webshop</a>
+            <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-primary px-3">
+                <a class="navbar-brand" href={% url 'shop:index' %}><p class="brand-slogan"><b>Django</b> Web Shop <span class="very-small-text ml-2">Hi {{ user.first_name }}!</span></p></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -70,7 +70,7 @@
                             <a class="nav-link" href={% url 'shop:categories' %}>Categories <span class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href={% url 'shop:search' %}>Search Products<span class="sr-only">(current)</span></a>
+                            <a class="nav-link" href={% url 'shop:search' %}>Search <span class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -84,7 +84,7 @@
                             </div>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href={% url 'shop:wishlist' %}>Wishlist<span class="sr-only">(current)</span></a>
+                            <a class="nav-link" href={% url 'shop:wishlist' %}><i class="fa fa-gift"></i> Wishlist<span class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href={% url 'shop:cart' %}><i class="fa fa-shopping-cart"></i> Cart<span class="sr-only">(current)</span></a>
@@ -94,8 +94,8 @@
             </nav>
         {% endif %}
     {% else %}
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <a class="navbar-brand" href={% url 'shop:index' %}>Django Webshop</a>
+        <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-primary px-3">
+                <a class="navbar-brand" href={% url 'shop:index' %}><p class="brand-slogan"><b>Django</b> Web Shop</p></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -109,7 +109,7 @@
                         <a class="nav-link" href={% url 'shop:categories' %}>Categories <span class="sr-only">(current)</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href={% url 'shop:search' %}>Search Products<span class="sr-only">(current)</span></a>
+                        <a class="nav-link" href={% url 'shop:search' %}>Search <span class="sr-only">(current)</span></a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href={% url 'login' %}>Login<span class="sr-only">(current)</span></a>

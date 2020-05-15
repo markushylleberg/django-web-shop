@@ -4,12 +4,12 @@
 
         <form action="{% url 'shop:confirm_order' %}" method="POST" class="row m-3">
         {% csrf_token %}
-            <div class="col-12">
-                <h1>Delivery and payment</h1>
-                <a href="{% url 'shop:cart' %}"><-- Back to cart</a>
+            <div class="space-for-nav col-12">
+                <h1 class="mx-4 dws-blue">Checkout <i class="fa fa-shopping-cart"></i></h1>
+                <a class="icon-btn dws-blue mx-4" href="{% url 'shop:cart' %}"><i class="fa fa-arrow-left"></i> Back to cart</a>
             </div>
             <div class="col-4 mt-3 p-3 border text-center">
-                <h3>Delivery information</h3>
+                <h3 class="my-2">Delivery information</h3>
                 <div class="row">
                 {% if user.is_authenticated %}
                     <div class="input-pair col-12">
@@ -65,32 +65,32 @@
                 </div>
             </div>
             <div class="col-4 mt-3 p-3 border text-center">
-                <h3>Delivery method</h3>
-                <div class="select-pair">
-                    <div>
-                        <label for="checkout_shipping_method">Select shipping method</label>
-                    </div>
-                    <select id="checkout_shipping_method" name="checkout_shipping_method">
+                <h3 class="my-2">Delivery method</h3>
+
+                <div class="form-group w-100 px-3">
+                    <label for="checkout_shipping_method">Select shipping method</label>
+                    <select class="form-control" id="checkout_shipping_method" name="checkout_shipping_method">
                         {% for shipping_method in shipping_methods %}
-                            <option value="{{ shipping_method.id }}">{{ shipping_method }} | {{ shipping_method.price }} kr</option>
+                            <option value="{{ shipping_method.id }}">{{ shipping_method }} | {{ shipping_method.price }} kr.</option>
                         {% endfor %}
                     </select>
                 </div>
+
                 <br />
                 <br />
                 <br />
-                <h3>Payment method</h3>
-                <div class="select-pair">
-                    <div>
-                        <label for="checkout_payment_method">Select payment method</label>
-                    </div>
-                    <select id="checkout_payment_method" name="checkout_payment_method">
+                <h3 class="my-2">Payment method</h3>
+
+                <div class="form-group w-100 px-3">
+                    <label for="checkout_payment_method">Select payment method</label>
+                    <select class="form-control" id="checkout_payment_method" name="checkout_payment_method">
                         <option value="1">User test money</option>
                         <option value="2" disabled>VISA</option>
                         <option value="3" disabled>Mastercard</option>
                         <option value="4" disabled>MobilePay</option>
                     </select>
                 </div>
+
             </div>
             <div class="col-4 mt-3 p-3 border text-center order-confirm-wrapper">
                 <h3 class="mb-3">Cart</h3>
@@ -99,10 +99,10 @@
                         <div class="col-4">
                             <img src="{{ MEIDA_URL }}{{ cart_product.product_variant.image.url }}">
                         </div>
-                        <div class="col-4">
+                        <div class="col-4 my-3">
                         <p>x {{ cart_product.quantity }}</p>
                         </div>
-                        <div class="col-4">
+                        <div class="col-4 my-3">
                             <p>{{ cart_product.total }} kr.</p>
                         </div>
                     </div>

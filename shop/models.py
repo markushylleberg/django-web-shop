@@ -6,6 +6,7 @@ from datetime import datetime
 
 class ProductCategory(models.Model):
     category = models.CharField(max_length=120)
+    category_desc = models.TextField()
 
     def __str__(self):
         return f'{self.category}'

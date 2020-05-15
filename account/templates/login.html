@@ -2,10 +2,10 @@
 
 {% block content %}
 
-    <div class="m-2">
+    <div class="space-for-nav p-3 text-center">
 
-        <h1><b>Login page</b></h1>
-
+        <h1><b>Login</b></h1>
+        <div class="dws-line my-4 w-100"></div>
         <p>Don't have an account? <a href="{% url 'signup' %}">Sign up</a></p>
 
         <form action="{% url 'login' %}" method="POST">

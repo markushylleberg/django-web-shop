@@ -2,9 +2,9 @@
 
 {% block content %}
 
-    <div class="m-3">
-        <h4>Details on order #{{ order.id }}</h4>
-        <a href="{% url 'shop:orders' %}"><-- back to orders</a>
+    <div class="space-for-nav p-3">
+        <h2 class="dws-blue">Details on order #{{ order.id }}</h2>
+        <a class="icon-btn dws-blue mx-4" href="{% url 'shop:orders' %}"><i class="fa fa-arrow-left"></i> Back to orders</a>
         <br />
         <br />
         <h1 class="text-secondary mx-3"><i>Order #{{ order.id }}</i></h1>
