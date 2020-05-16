@@ -12,13 +12,13 @@
             {% for product_variant in product_variants %}
                 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                     {% if product_variant.stock == 0  %}
-                    <div class="card index-card p-2">
-                        <div class="p-4">
+                    <div class="card index-card">
+                        <div>
                             <img class="card-img-top img-fluid disabled" style="max-height: 20em; object-fit: cover;" src="{{ MEDIA_URL }} {{ product_variant.image.url }}" alt="Image of {{ product_variant.product.title }}">
                         </div>
                     {% else %}
-                        <div class="card index-card p-2">
-                            <div class="p-4">
+                        <div class="card index-card">
+                            <div>
                                 <img class="card-img-top img-fluid" style="max-height: 20em; object-fit: cover;" src="{{ MEDIA_URL }} {{ product_variant.image.url }}" alt="Image of {{ product_variant.product.title }}">
                             </div>
                     {% endif %}

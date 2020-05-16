@@ -11,7 +11,7 @@
 
     <div class="row">
         <div class="col-md-6 col-sm-12">
-            <img class="img-fluid rounded mx-auto d-block" src="{{ MEDIA_URL }} {{ product_variant.image.url }}" alt="{{ product_variant.product.title }}" />
+            <img class="img-fluid rounded mx-auto p-4 d-block" src="{{ MEDIA_URL }} {{ product_variant.image.url }}" alt="{{ product_variant.product.title }}" />
         </div>
         <div class="col-md-6 col-sm-12 p-4">
             <h6 class="dws-blue">{{ product_variant.product.category }}</h6>
@@ -28,25 +28,25 @@
             <div class="product-variants-container mt-3">
                 <p class="very-small-text"><i>Other variants</i></p>
                 <div class="d-flex">
-                {% for product_other_variant in product_other_variants %}
-                    {% if product_variant.id is not product_other_variant.id %}
-                        <div class="card product-variant-card m-1 w-25 text-center">
-                            <form action="{% url 'shop:product_detail' %}">
-                                <input type="hidden" value="{{ product_other_variant.product.id }}" name="product_id" />
-                                <input type="hidden" value="{{ product_other_variant.id }}" name="product_variant_id" />
-                                <button class="icon-btn">
-                                    {% if product_other_variant.stock == 0 %}
-                                        <img class="img-fluid disabled" src="{{ MEIDA_URL }}{{ product_other_variant.image.url }}">{{product_other_variant.}}</img>
-                                        <p class="text-danger"><i>SOLD OUT</i></p>
-                                    {% else %}
-                                        <img class="img-fluid" src="{{ MEIDA_URL }}{{ product_other_variant.image.url }}">{{product_other_variant.}}</img>
-                                        <p>{{ product_other_variant.price }} kr.</p>
-                                    {% endif %}
-                                </button>
-                            </form>
-                        </div>
-                    {% endif %}
-                {% endfor %}
+                    {% for product_other_variant in product_other_variants %}
+                        {% if product_variant.id is not product_other_variant.id %}
+                            <div class="card product-variant-card m-1 w-25 text-center">
+                                <form action="{% url 'shop:product_detail' %}">
+                                    <input type="hidden" value="{{ product_other_variant.product.id }}" name="product_id" />
+                                    <input type="hidden" value="{{ product_other_variant.id }}" name="product_variant_id" />
+                                    <button class="icon-btn">
+                                        {% if product_other_variant.stock == 0 %}
+                                            <img class="img-fluid disabled" src="{{ MEIDA_URL }}{{ product_other_variant.image.url }}">{{product_other_variant.}}</img>
+                                            <p class="text-danger very-small-text"><b>SOLD OUT</b></p>
+                                        {% else %}
+                                            <img class="img-fluid" src="{{ MEIDA_URL }}{{ product_other_variant.image.url }}">{{product_other_variant.}}</img>
+                                            <p class="very-small-text">{{ product_other_variant.price }} kr.</p>
+                                        {% endif %}
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
             <div class="dws-line mt-3"></div>

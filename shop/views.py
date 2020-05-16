@@ -15,7 +15,7 @@ from account.models import UserProfile
 
 def index(req):
 
-    product_variants = ProductVariant.objects.all().order_by('-product__title', '-stock')
+    product_variants = ProductVariant.objects.all().order_by('product__title', '-stock')
 
     context = {
         'product_variants': product_variants
@@ -37,12 +37,11 @@ def categories(req):
     if req.method == 'POST':
         category_id = req.POST['category_id']
 
-        category_products = Product.objects.filter(category=category_id)
-        category_product_variants = ProductVariant.objects.filter(product=category_products[0])
+        category_products = Product.objects.values_list('id', flat=True).filter(category=category_id)
+        category_product_variants = ProductVariant.objects.filter(product__in=category_products)
         category_title = ProductCategory.objects.filter(id=category_id)[0]
 
         context = {
-            'category_products': category_products,
             'category_product_variants': category_product_variants,
             'category_title': category_title
         }
@@ -79,10 +78,10 @@ def product_detail(req):
 
 def search(req):
 
-    attributes_values_used = ProductAttribute.objects.values('attribute', 'value').distinct()
+    attributes_values_used = ProductAttribute.objects.values('attribute', 'value').order_by('value').distinct()
 
     attributes_used = ProductAttribute.objects.values_list('attribute', flat=True).distinct()
-    attributes = ProductAttributeOption.objects.all().filter(id__in=attributes_used)
+    attributes = ProductAttributeOption.objects.all().filter(id__in=attributes_used).order_by('attribute')
 
     context = {
         'values': attributes_values_used,

@@ -142,5 +142,7 @@ b {
 }
 
 .small-img {
-    max-width: 50px!important;
+    max-width: 80px!important;
+    height: auto!important;
+    object-fit: cover!important;
 }

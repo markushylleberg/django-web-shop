@@ -18,7 +18,7 @@ class Product(models.Model):
     category = models.ForeignKey(ProductCategory, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
-        return f'{self.id}'
+        return f'{self.title}'
 
 
 class ProductVariant(models.Model):
