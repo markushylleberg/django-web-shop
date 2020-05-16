@@ -27,15 +27,15 @@
                                     <form action="{% url 'shop:increase_quantity' %}" method="POST">
                                         {% csrf_token %}
                                         <input type="hidden" value="{{ cart_product_quantity.product_variant_id }}" name="product_variant_id">
-                                        <button class="icon-btn dws-blue large-text"><b>+</b></button>
+                                        <button class="icon-btn large-text"><b>+</b></button>
                                     </form>
 
-                                    <p class="mx-2 my-1 dws-blue">Qty: <b>{{ cart_product_quantity.quantity }}</b></p>
+                                    <p class="mx-2 my-1">Qty: <b>{{ cart_product_quantity.quantity }}</b></p>
 
                                     <form action="{% url 'shop:decrease_quantity' %}" method="POST">
                                         {% csrf_token %}
                                         <input type="hidden" value="{{ cart_product_quantity.product_variant_id }}" name="product_variant_id">
-                                        <button class="icon-btn dws-blue large-text"><b>-</b></button>
+                                        <button class="icon-btn large-text"><b>-</b></button>
                                     </form>
 
                                     <form action="{% url 'shop:remove_product_from_cart' %}" method="POST">

@@ -9,7 +9,7 @@ from django.utils.crypto import get_random_string
 from django.urls import reverse
 
 from . messaging import order_confirmation_email
-from .models import Product, ProductVariant, ProductAttribute, ProductAttributeOption, ProductCategory, UserProductVariantWishlist, UserProductVariantCart, ShippingMethod, Invoice, InvoiceProduct
+from . models import Product, ProductVariant, ProductAttribute, ProductAttributeOption, ProductCategory, UserProductVariantWishlist, UserProductVariantCart, ShippingMethod, Invoice, InvoiceProduct
 from account.models import UserProfile
 
 
@@ -72,6 +72,7 @@ def product_detail(req):
         'product_attributes': product_attributes,
         'quantity': range(1, product_variant.stock + 1 - total_amount_in_carts)
     }
+
     return render(req, 'pages/products/product.html', context)
 
 
@@ -79,7 +80,6 @@ def product_detail(req):
 def search(req):
 
     attributes_values_used = ProductAttribute.objects.values('attribute', 'value').order_by('value').distinct()
-
     attributes_used = ProductAttribute.objects.values_list('attribute', flat=True).distinct()
     attributes = ProductAttributeOption.objects.all().filter(id__in=attributes_used).order_by('attribute')
 
@@ -131,18 +131,15 @@ def search(req):
             'products': product_query,
             'product_variants': final_return_query_product_variants
         }
+
     return render(req, 'pages/products/search.html', context)
 
 
 def cart(req):
 
     cart_products = list(UserProductVariantCart.objects.filter(user=req.user).values_list('product_variant', flat=True))
-
     cart_product_quantity = UserProductVariantCart.objects.filter(user=req.user)
-
     product_variants = ProductVariant.objects.filter(id__in=cart_products)
-
-    product_variants_list = ProductVariant.objects.filter(id__in=cart_products).values_list('product_id', flat=True)
 
     cart_total = 0
 
@@ -160,11 +157,11 @@ def cart(req):
 
 
 def add_to_cart(req):
+
     if req.method == 'POST':
         product_variant_id = req.POST['product_variant_id']
         quantity = req.POST['quantity']
 
-        ## Check if item is in database and in the requested stock amount
         is_product_available = ProductVariant.objects.filter(Q(id=product_variant_id), Q(stock__gte=quantity)).exists()
         if is_product_available:
             product_already_in_cart = UserProductVariantCart.objects.filter(Q(user=req.user), Q(product_variant=product_variant_id))
@@ -190,24 +187,22 @@ def increase_quantity(req):
     if req.method == 'POST':
         product_variant = req.POST['product_variant_id']
         user = req.user
-        if user.is_authenticated:
-            product_variant_currently_in_carts = list(UserProductVariantCart.objects.filter(product_variant=product_variant).values_list('quantity', flat=True))
 
-            total_amount_in_carts = 0
+        product_variant_currently_in_carts = list(UserProductVariantCart.objects.filter(product_variant=product_variant).values_list('quantity', flat=True))
 
-            for product_variant_currently_in_cart in product_variant_currently_in_carts:
-                total_amount_in_carts += product_variant_currently_in_cart
+        total_amount_in_carts = 0
 
-            product_variant_stock = ProductVariant.objects.values_list('stock', flat=True).filter(id=product_variant)[0]
+        for product_variant_currently_in_cart in product_variant_currently_in_carts:
+            total_amount_in_carts += product_variant_currently_in_cart
 
-            if product_variant_stock == total_amount_in_carts:
-                print('not available at the moment')
-            else:
-                user_cart_product = UserProductVariantCart.objects.filter(Q(user=user), Q(product_variant=product_variant))[0]
-                user_cart_product.quantity += 1
-                user_cart_product.save()
+        product_variant_stock = ProductVariant.objects.values_list('stock', flat=True).filter(id=product_variant)[0]
+
+        if product_variant_stock == total_amount_in_carts:
+            print('not available at the moment')
         else:
-            print('we need to change the quantity in the cookie of an unnauthenticated user')
+            user_cart_product = UserProductVariantCart.objects.filter(Q(user=user), Q(product_variant=product_variant))[0]
+            user_cart_product.quantity += 1
+            user_cart_product.save()
 
     return HttpResponseRedirect(reverse('shop:cart'))
 
@@ -215,19 +210,16 @@ def increase_quantity(req):
 def decrease_quantity(req):
 
     if req.method == 'POST':
-        if req.user.is_authenticated:
-            product_variant = req.POST['product_variant_id']
-            user = req.user
+        product_variant = req.POST['product_variant_id']
+        user = req.user
 
-            user_cart_product = UserProductVariantCart.objects.filter(Q(user=user), Q(product_variant=product_variant))[0]
+        user_cart_product = UserProductVariantCart.objects.filter(Q(user=user), Q(product_variant=product_variant))[0]
 
-            if user_cart_product.quantity == 1:
-                user_cart_product.delete()
-            else:
-                user_cart_product.quantity -= 1
-                user_cart_product.save()
+        if user_cart_product.quantity == 1:
+            user_cart_product.delete()
         else:
-            print('we need to change the quantity in the cookie of an unnauthenticated user')
+            user_cart_product.quantity -= 1
+            user_cart_product.save()
 
     return HttpResponseRedirect(reverse('shop:cart'))
 
@@ -235,26 +227,21 @@ def decrease_quantity(req):
 def remove_product_from_cart(req):
 
     if req.method == 'POST':
-        if req.user.is_authenticated:
-            product_variant = req.POST['product_variant_id']
-            user = req.user
+        product_variant = req.POST['product_variant_id']
+        user = req.user
 
-            user_cart_product = UserProductVariantCart.objects.filter(Q(user=user), Q(product_variant=product_variant))[0]
-            user_cart_product.delete()
-        else:
-            print('we need to do remome this item from a cookie in a unauthenticated user')
+        user_cart_product = UserProductVariantCart.objects.filter(Q(user=user), Q(product_variant=product_variant))[0]
+        user_cart_product.delete()
 
     return HttpResponseRedirect(reverse('shop:cart'))
 
 
-@login_required(login_url='/account/login/')
 def add_to_wishlist(req):
 
     if req.method == 'POST':
         product_variant_id = req.POST['product_variant_id']
 
         product_variant = ProductVariant.objects.all().filter(id=product_variant_id)[0]
-
         item_currently_on_wishlist = UserProductVariantWishlist.objects.values_list('product_variant_id', flat=True).filter(Q(user=req.user), Q(product_variant=product_variant_id)).exists()
 
         if item_currently_on_wishlist:
@@ -268,7 +255,6 @@ def add_to_wishlist(req):
     return HttpResponseRedirect(reverse('shop:index'))
 
 
-@login_required(login_url='/account/login/')
 def remove_from_wishlist(req):
 
     if req.method == 'POST':
@@ -280,20 +266,15 @@ def remove_from_wishlist(req):
     return HttpResponseRedirect(reverse('shop:wishlist'))
 
 
-@login_required(login_url='/account/login/')
 def wishlist(req):
 
-    ## Users product variants on his/hers wishlist
     wishlist_product_variants_list = list(UserProductVariantWishlist.objects.filter(user=req.user).values_list('product_variant', flat=True))
-
-    ## Instances of product variants
     product_variants = ProductVariant.objects.filter(id__in=wishlist_product_variants_list)
 
     context = {
         'product_variants': product_variants
     }
     return render(req, 'pages/user/wishlist.html', context)
-
 
 
 def checkout(req):
@@ -373,58 +354,54 @@ def confirm_order(req):
 def confirmation(req):
 
     if req.method == 'POST':
-        if req.user.is_authenticated:
-            user = req.user
-            email = req.POST['confirm_email']
-            address = req.POST['confirm_address']
-            city = req.POST['confirm_city']
-            country = req.POST['confirm_country']
-            shipping_method = req.POST['confirm_shipping_method']
+        user = req.user
+        email = req.POST['confirm_email']
+        address = req.POST['confirm_address']
+        city = req.POST['confirm_city']
+        country = req.POST['confirm_country']
+        shipping_method = req.POST['confirm_shipping_method']
 
-            cart_products = UserProductVariantCart.objects.filter(user=req.user)
-            shipping = ShippingMethod.objects.filter(id=shipping_method)[0]
+        cart_products = UserProductVariantCart.objects.filter(user=req.user)
+        shipping = ShippingMethod.objects.filter(id=shipping_method)[0]
 
-            cart_total = 0
+        cart_total = 0
 
-            for cart_product in cart_products:
-                cart_total += cart_product.total()
+        for cart_product in cart_products:
+            cart_total += cart_product.total()
 
-            ## Create new Invoice instance
-            new_invoice = Invoice()
-            new_invoice.user = user
-            new_invoice.shipping_method = shipping
-            new_invoice.total_price = cart_total+shipping.price
-            new_invoice.shipping_address = address
-            new_invoice.shipping_city = city
-            new_invoice.shipping_country = country
-            new_invoice.save()
+        ## Create new Invoice instance
+        new_invoice = Invoice()
+        new_invoice.user = user
+        new_invoice.shipping_method = shipping
+        new_invoice.total_price = cart_total+shipping.price
+        new_invoice.shipping_address = address
+        new_invoice.shipping_city = city
+        new_invoice.shipping_country = country
+        new_invoice.save()
 
-            ## Create the Invoice Products assigned to that Invoice
-            for cart_product in cart_products:
-                new_invoice_product = InvoiceProduct()
-                new_invoice_product.invoice = new_invoice
-                new_invoice_product.product = cart_product.product_variant
-                new_invoice_product.quantity = cart_product.quantity
-                new_invoice_product.save()
+        ## Create the Invoice Products assigned to that Invoice
+        for cart_product in cart_products:
+            new_invoice_product = InvoiceProduct()
+            new_invoice_product.invoice = new_invoice
+            new_invoice_product.product = cart_product.product_variant
+            new_invoice_product.quantity = cart_product.quantity
+            new_invoice_product.save()
 
-                ## Reduce the quantity in the database
-                product = ProductVariant.objects.filter(id=cart_product.product_variant.id)[0]
-                product.stock -= cart_product.quantity
-                product.save()
+            ## Reduce the quantity in the database
+            product = ProductVariant.objects.filter(id=cart_product.product_variant.id)[0]
+            product.stock -= cart_product.quantity
+            product.save()
 
-            ## Send confirmation email to user
-            django_rq.enqueue(order_confirmation_email, {
-                'order_id': new_invoice.id,
-                'order_total': cart_total,
-                'email': email,
-            })
+        ## Send confirmation email to user
+        django_rq.enqueue(order_confirmation_email, {
+            'order_id': new_invoice.id,
+            'order_total': cart_total,
+            'email': email,
+        })
 
-            ## Empty the cart
-            cart = UserProductVariantCart.objects.filter(user=user)
-            cart.delete()
-
-        else:
-            print('the user is not logged in')
+        ## Empty the cart
+        cart = UserProductVariantCart.objects.filter(user=user)
+        cart.delete()
 
     context = {
         'email': email
@@ -440,38 +417,32 @@ def orders(req):
     context = {
         'orders': orders
     }
+
     return render(req, 'pages/user/my_orders.html', context)
 
 
 def order_detail(req):
 
     if req.method == 'POST':
-        if req.user.is_authenticated:
-            order_id = req.POST['order_id']
+        order_id = req.POST['order_id']
 
-            order = Invoice.objects.filter(Q(user=req.user), Q(id=order_id))[0]
-            order_products = InvoiceProduct.objects.filter(invoice=order_id)
+        order = Invoice.objects.filter(Q(user=req.user), Q(id=order_id))[0]
+        order_products = InvoiceProduct.objects.filter(invoice=order_id)
 
-            cart_total = order.total_price - order.shipping_method.price
-            print(cart_total)
+        cart_total = order.total_price - order.shipping_method.price
+        print(cart_total)
 
-            context = {
-                'order': order,
-                'order_products': order_products,
-                'cart_total': cart_total
-            }
-        else:
-            print('User is not logged in')
+        context = {
+            'order': order,
+            'order_products': order_products,
+            'cart_total': cart_total
+        }
 
     return render(req, 'pages/user/order_details.html', context)
 
 
 
 def order_overview(req):
-
-    # context = {}
-
-    # if req.user.is_authenticated and req.user.is_superuser:
         
     invoices = Invoice.objects.all()
     invoice_products = InvoiceProduct.objects.all()
@@ -490,10 +461,6 @@ def order_overview(req):
             invoice = Invoice.objects.filter(id=invoice_id)[0]
             invoice.status = status
             invoice.save()
-            return render(req, 'pages/administator/order_overview.html', context)
-
-    # else:
-    #     return HttpResponseRedirect(reverse('shop:index'))
 
     return render(req, 'pages/administator/order_overview.html', context)
 
@@ -501,10 +468,6 @@ def order_overview(req):
 
 def sales_overview(req):
 
-    # context = {}
-
-    # if req.user.is_authenticated and req.user.is_superuser:
-        
     total_revenue = Invoice.objects.aggregate(sum=Sum('total_price'))
     invoices = Invoice.objects.all()
     invoice_products = InvoiceProduct.objects.all()
@@ -533,8 +496,5 @@ def sales_overview(req):
         'best_seller_products': top_3_products,
         'sold_out_product_variants': sold_out_product_variants
     }
-
-    # else:
-    #     return HttpResponseRedirect(reverse('shop:index'))
 
     return render(req, 'pages/administator/sales_overview.html', context)
