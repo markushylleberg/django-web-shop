@@ -68,9 +68,11 @@
                         {% endif %}
                     <h3 class="my-3"><b>{{ product_variant.price }} kr.</b></h3>
                     {% if quantity %}
-                        <button class="btn btn-primary"><i class="fa fa-shopping-cart"></i> Add to cart</button>
                         {% if user.is_authenticated %}
+                            <button class="btn btn-primary"><i class="fa fa-shopping-cart"></i> Add to cart</button>
                             <button class="icon-btn"><i class="fa fa-heart dws-blue"></i></button>
+                        {% else %}
+                            <p><i class="fa fa-exclamation-circle"></i> You need to be logged in to add this product to your <u>cart</u> and <u>wishlist</u>!</p>
                         {% endif %}
                     {% else %}
                         <p class="text-danger"><i>Not available at the moment</i></p>

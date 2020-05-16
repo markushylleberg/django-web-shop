@@ -12,10 +12,10 @@ class PasswordResetRequest(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    address = models.CharField(max_length=200, null=True, blank=True)
-    city = models.CharField(max_length=120, null=True, blank=True)
-    country = models.CharField(max_length=90, null=True, blank=True)
-    phone_number = models.CharField(max_length=20, null=True, blank=True)
+    address = models.CharField(max_length=200, null=True, blank=True, default='')
+    city = models.CharField(max_length=120, null=True, blank=True, default='')
+    country = models.CharField(max_length=90, null=True, blank=True, default='')
+    phone_number = models.CharField(max_length=20, null=True, blank=True, default='')
 
     def __str__(self):
         return f'{self.user} - User profile'

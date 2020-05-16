@@ -146,3 +146,7 @@ b {
     height: auto!important;
     object-fit: cover!important;
 }
+
+.fa-heart.dws-blue:hover {
+    color: rgb(175, 230, 255)!important;
+}

@@ -295,71 +295,79 @@ def wishlist(req):
     return render(req, 'pages/user/wishlist.html', context)
 
 
+
 def checkout(req):
 
-    context = {}
-
-    if req.user.is_authenticated:
-        user = UserProfile.objects.filter(user=req.user.id)
-        cart_products = UserProductVariantCart.objects.select_related('product_variant').filter(user=req.user)
-        shipping_methods = ShippingMethod.objects.all()
-
-        cart_total = 0
-
-        for cart_product in cart_products:
-            cart_total += cart_product.total()
-
-        context = {
-            'cart_total': cart_total,
-            'cart_products': cart_products,
-            'user_profile': user[0],
-            'shipping_methods': shipping_methods
-        }
-        
-
-    else:
-        print('we need to show the cart products from a cookie from a unauthenticated user')
-
-    return render(req, 'pages/checkout/checkout.html', context)
-
-
-def confirm_order(req):
-
-    first_name = req.POST['checkout_firstname']
-    last_name = req.POST['checkout_lastname']
-    address = req.POST['checkout_address']
-    city = req.POST['checkout_city']
-    country = req.POST['checkout_country']
-    phone = req.POST['checkout_phone']
-
-    shipping_method = req.POST['checkout_shipping_method']
-    payment_method = req.POST['checkout_payment_method']
-
-    cart_products = UserProductVariantCart.objects.filter(user=req.user)
-    shipping = ShippingMethod.objects.filter(id=shipping_method)[0]
+    user = UserProfile.objects.filter(user=req.user.id)
+    cart_products = UserProductVariantCart.objects.select_related('product_variant').filter(user=req.user)
+    shipping_methods = ShippingMethod.objects.all()
 
     cart_total = 0
 
     for cart_product in cart_products:
         cart_total += cart_product.total()
 
-    user_data = {
-        'first_name': first_name,
-        'last_name': last_name,
-        'address': address,
-        'city': city,
-        'country': country,
-        'phone': phone
-    }
-
     context = {
         'cart_total': cart_total,
-        'shipping': shipping,
         'cart_products': cart_products,
-        'user_profile': user_data
+        'user_profile': user[0],
+        'shipping_methods': shipping_methods
     }
 
-    return render(req, 'pages/checkout/confirm_order.html', context)
+
+    if req.method == 'POST':
+
+        first_name = req.POST['checkout_firstname']
+        last_name = req.POST['checkout_lastname']
+        address = req.POST['checkout_address']
+        city = req.POST['checkout_city']
+        country = req.POST['checkout_country']
+        phone = req.POST['checkout_phone']
+
+        shipping_method = req.POST['checkout_shipping_method']
+        payment_method = req.POST['checkout_payment_method']
+
+        if len(first_name) > 1 and len(last_name) > 1 and len(address) > 1 and len(city) > 1 and len(country) > 1 and len(phone) > 1:
+
+            cart_products = UserProductVariantCart.objects.filter(user=req.user)
+            shipping = ShippingMethod.objects.filter(id=shipping_method)[0]
+
+            cart_total = 0
+
+            for cart_product in cart_products:
+                cart_total += cart_product.total()
+
+            user_data = {
+                'first_name': first_name,
+                'last_name': last_name,
+                'address': address,
+                'city': city,
+                'country': country,
+                'phone': phone
+            }
+
+            context = {
+                'cart_total': cart_total,
+                'shipping': shipping,
+                'cart_products': cart_products,
+                'user_profile': user_data
+            }
+            return render(req, 'pages/checkout/confirm_order.html', context)
+        else:
+            context = {
+                'cart_total': cart_total,
+                'cart_products': cart_products,
+                'user_profile': user[0],
+                'shipping_methods': shipping_methods,
+                'message': 'Please make sure you have entered all fields.'
+            }
+
+    return render(req, 'pages/checkout/checkout.html', context)
+
+
+def confirm_order(req):
+
+    return render(req, 'pages/checkout/confirm_order.html')
 
 
 def confirmation(req):

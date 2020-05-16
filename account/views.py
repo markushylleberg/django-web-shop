@@ -3,6 +3,8 @@ from django.shortcuts import render, reverse
 from django.contrib.auth import authenticate, login as login_method, logout as logout_method
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 
 from . messaging import new_password_req_email
 from . models import PasswordResetRequest, UserProfile
@@ -44,31 +46,67 @@ def signup(req):
 
     context = {}
     if req.method == 'POST':
+        if req.POST['first_name'] and req.POST['last_name'] and req.POST['username'] and req.POST['email'] and req.POST['password'] and req.POST['password_confirm']:
+            firstname = req.POST['first_name']
+            lastname = req.POST['last_name']
+            username = req.POST['username']
+            email = req.POST['email']
+            password1 = req.POST['password']
+            password2 = req.POST['password_confirm']
 
-        ### Input values
-        firstname = req.POST['first_name']
-        lastname = req.POST['last_name']
-        username = req.POST['username']
-        email = req.POST['email']
-        password1 = req.POST['password']
-        password2 = req.POST['password_confirm']
-
-        if password1 == password2: ### Check if passwords match
-            if User.objects.filter(username=username).exists(): ### Check if user already exists
-                context = {
-                    'message': 'User already exists'
-                }
+            try:
+                validate_email(email)
+            except ValidationError as error:
+                print("Email is not valid:", error)
             else:
-                User.objects.create_user(
-                    username, email, password1, first_name=firstname, last_name=lastname
-                )
-                context = {
-                    'message': 'User has been created! You can now go you the login page and login.'
-                }
+                if password1 == password2:
+                    if len(password1) >= 8:
+                        if User.objects.filter(username=username).exists(): ### Check if user already exists
+                            context = {
+                                'message': 'User already exists'
+                            }
+                        else:
+                            User.objects.create_user(username, email, password1, first_name=firstname, last_name=lastname)
+                            context = {
+                                'message': 'User has been created! You can now go you the login page and login.'
+                            }
+                    else:
+                        context = {
+                            'message': 'Password must be a least 8 characters.'
+                        }
+                else:
+                    context = {
+                        'message': 'Passwords did not match.'
+                    }
         else:
             context = {
-                'message': 'Passwords did not match.'
+                'message': 'Please fill out all fields.'
             }
+        ### Input values
+        # firstname = req.POST['first_name']
+        # lastname = req.POST['last_name']
+        # username = req.POST['username']
+        # email = req.POST['email']
+        # password1 = req.POST['password']
+        # password2 = req.POST['password_confirm']
+
+
+        # if password1 == password2: ### Check if passwords match
+        #     if User.objects.filter(username=username).exists(): ### Check if user already exists
+        #         context = {
+        #             'message': 'User already exists'
+        #         }
+        #     else:
+        #         User.objects.create_user(
+        #             username, email, password1, first_name=firstname, last_name=lastname
+        #         )
+        #         context = {
+        #             'message': 'User has been created! You can now go you the login page and login.'
+        #         }
+        # else:
+        #     context = {
+        #         'message': 'Passwords did not match.'
+        #     }
     return render(req, 'signup.html', context)
 
 

@@ -60,7 +60,7 @@
         <div class="m-3">
             {% if cart_total > 0 %}
                 <div class="check-out-wrapper text-right">
-                    <form action="{% url 'shop:checkout' %}" method="POST">
+                    <form action="{% url 'shop:checkout' %}">
                         {% csrf_token %}
                         <button class="btn btn-primary">Next</button>
                     </form>

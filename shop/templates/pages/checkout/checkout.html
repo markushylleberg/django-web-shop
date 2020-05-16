@@ -2,7 +2,7 @@
 
 {% block content %}
 
-        <form action="{% url 'shop:confirm_order' %}" method="POST" class="row m-3">
+        <form action="{% url 'shop:checkout' %}" method="POST" class="row m-3">
         {% csrf_token %}
             <div class="space-for-nav col-12">
                 <h1 class="mx-4 dws-blue">Checkout <i class="fa fa-shopping-cart"></i></h1>
@@ -111,6 +111,9 @@
                 <div class="text-right p-3">
                     <p class="large-text">Total: <b>{{ cart_total }} kr.</b></p>
                     <button class="btn btn-primary">Next</button>
+                    {% if message %}
+                        <p class="text-danger">{{ message }}</p>
+                    {% endif %}
                 </div>
             </div>
         </form>
