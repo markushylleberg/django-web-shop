@@ -1,6 +1,6 @@
 # django-web-shop
 
-## A E-commerce site build with the Django Framework. 
+## A E-commerce site build with the Django framework. 
 
 ### Details
 
@@ -20,4 +20,4 @@
 
 ### API
 
-There is also an API connected to this project where you can fetch and manipulate the invoices of the system.
+There is an API connected to this project where you can fetch and manipulate the invoices of the system. This would be relevant if the owners of the django-web-shop would build their own system eg. for the warehouse managers to pack the orders and mark them as 'packed' or 'shipped'.
