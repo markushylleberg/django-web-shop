@@ -1,6 +1,6 @@
 # django-web-shop
 
-## A E-commerce site build with the Django framework. 
+## An E-commerce site build with the Django framework. 
 
 ### Details
 
