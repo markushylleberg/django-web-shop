@@ -15,7 +15,8 @@ class ProductCategory(models.Model):
 class Product(models.Model):
     title = models.CharField(max_length=150)
     description = models.TextField()
-    category = models.ForeignKey(ProductCategory, null=True, on_delete=models.SET_NULL)
+    category = models.ForeignKey(
+        ProductCategory, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return f'{self.title}'
@@ -24,11 +25,26 @@ class Product(models.Model):
 class ProductVariant(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=19, decimal_places=2)
-    stock = models.PositiveIntegerField()
     image = models.ImageField(validators=[FileExtensionValidator(allowed_extensions=['jpg', 'png', 'jpeg'])])
 
     def __str__(self):
         return f'{self.product.title} - {self.image} - {self.price}'
+
+
+class ProductVariantSizeOption(models.Model):
+    size = models.CharField(max_length=80)
+
+    def __str__(self):
+        return self.size
+
+
+class ProductVariantSize(models.Model):
+    product_variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
+    size = models.ForeignKey(ProductVariantSizeOption, on_delete=models.SET_NULL, null=True)
+    stock = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f'{self.product_variant.product.title} - {self.size}'
 
 
 class ProductAttributeOption(models.Model):
@@ -91,7 +107,8 @@ class Invoice(models.Model):
 
 class InvoiceProduct(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='invoice_products')
-    product = models.ForeignKey(ProductVariant, on_delete=models.CASCADE) ## Should be PROTECT, but for development we'll keep it at CASCADE
+    # Should be PROTECT, but for development we'll keep it at CASCADE
+    product = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
 
     def total(self):

@@ -9,13 +9,13 @@ from django.utils.crypto import get_random_string
 from django.urls import reverse
 
 from . messaging import order_confirmation_email
-from . models import Product, ProductVariant, ProductAttribute, ProductAttributeOption, ProductCategory, UserProductVariantWishlist, UserProductVariantCart, ShippingMethod, Invoice, InvoiceProduct
+from . models import Product, ProductVariant, ProductVariantSize, ProductAttribute, ProductAttributeOption, ProductCategory, UserProductVariantWishlist, UserProductVariantCart, ShippingMethod, Invoice, InvoiceProduct
 from account.models import UserProfile
 
 
 def index(req):
 
-    product_variants = ProductVariant.objects.all().order_by('product__title', '-stock')
+    product_variants = ProductVariant.objects.all().order_by('product__title')
 
     context = {
         'product_variants': product_variants
@@ -55,6 +55,25 @@ def product_detail(req):
     product_id = req.GET['product_id']
     product_variant_id = req.GET['product_variant_id']
 
+    if req.method == 'GET' and 'product_variant_size' in req.GET:
+        product_variant_size = req.GET['product_variant_size']
+        all_sizes = ProductVariantSize.objects.filter(product_variant=product_variant_id)
+
+        selected_size = []
+        other_sizes_list = []
+
+        for product_size in all_sizes:
+            if product_size.size.id == int(product_variant_size):
+                selected_size.append(product_size)
+            else:
+                other_sizes_list.append(product_size.size.id)
+
+    else:
+        all_sizes = ProductVariantSize.objects.filter(product_variant=product_variant_id)
+        selected_size = [all_sizes[0]]
+
+    print(selected_size[0].stock)
+
     product_variant = ProductVariant.objects.filter(id=product_variant_id)[0]
     product_other_variants = ProductVariant.objects.filter(product=product_id)
     product_attributes = ProductAttribute.objects.filter(entity=product_variant_id)
@@ -68,9 +87,11 @@ def product_detail(req):
 
     context = {
         'product_variant': product_variant,
+        'product_sizes': all_sizes,
+        'selected_size': selected_size[0],
         'product_other_variants': product_other_variants,
         'product_attributes': product_attributes,
-        'quantity': range(1, product_variant.stock + 1 - total_amount_in_carts)
+        'quantity': range(1, selected_size[0].stock + 1 - total_amount_in_carts)
     }
 
     return render(req, 'pages/products/product.html', context)

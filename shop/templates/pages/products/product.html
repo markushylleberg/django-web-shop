@@ -48,6 +48,25 @@
                         {% endif %}
                     {% endfor %}
                 </div>
+                <p class="very-small-text">Select size</p>
+                    <div class="d-flex">
+                        {% for product_size in product_sizes %}
+                            {% if product_size == selected_size %}
+                                <div class="m-2 p-2 border pressed">{{ product_size.size }} <span class="very-small-text">({{ product_size.stock }})</span></div>
+                            {% else %} 
+                            <div>
+                                <form action="{% url 'shop:product_detail' %}">
+                                    <input type="hidden" value="{{ product_size.product_variant.product.id }}" name="product_id" />
+                                    <input type="hidden" value="{{ product_size.product_variant.id }}" name="product_variant_id" />
+                                    <input type="hidden" value="{{ product_size.size.id }}" name="product_variant_size" />
+                                    <button class="m-2 p-2 border pointer">
+                                        {{ product_size.size }} <span class="very-small-text">({{ product_size.stock }})</span>
+                                    </button>
+                                </form>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
             </div>
             <div class="dws-line mt-3"></div>
 

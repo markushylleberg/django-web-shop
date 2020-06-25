@@ -6,6 +6,12 @@
     pointer-events: none;
 }
 
+.pressed {
+    pointer-events: none;
+    background-color: lightgray;
+    border: 1px solid black;
+}
+
 .order-confirm-wrapper img, .small-img {
     max-width: 60px;
 }
@@ -149,4 +155,8 @@ b {
 
 .fa-heart.dws-blue:hover {
     color: rgb(175, 230, 255)!important;
+}
+
+.pointer {
+    cursor: pointer;
 }
