@@ -105,9 +105,11 @@ def search(req):
                 items = ProductAttribute.objects.values('entity').filter(Q(value=query_value))
                 items_found.append(items)
 
+        print(items_found)
+
         filter_count = len(items_found)
 
-        result_list = []
+        result_list = [] 
 
         final_return = []
 

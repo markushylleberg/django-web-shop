@@ -15,7 +15,7 @@
     {% if user.is_authenticated %}
         {% if user.is_superuser %}
             <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-dark brand px-3">
-                <a class="navbar-brand" href={% url 'shop:index' %}><p class="brand-slogan"><b>Django</b> Web Shop <span class="very-small-text ml-2">Hi {{ user.first_name }}!</span></p></a>
+                <a class="navbar-brand" href={% url 'shop:index' %}><p class="brand-slogan"><b>Django</b> Webshop <span class="very-small-text ml-2">Hi {{ user.first_name }}!</span></p></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -95,7 +95,7 @@
         {% endif %}
     {% else %}
         <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-primary px-3">
-                <a class="navbar-brand" href={% url 'shop:index' %}><p class="brand-slogan"><b>Django</b> Web Shop</p></a>
+                <a class="navbar-brand" href={% url 'shop:index' %}><p class="brand-slogan"><b>Django</b> Webshop</p></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
