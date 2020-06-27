@@ -9,16 +9,18 @@ from django.utils.crypto import get_random_string
 from django.urls import reverse
 
 from . messaging import order_confirmation_email
-from . models import Product, ProductVariant, ProductVariantSize, ProductAttribute, ProductAttributeOption, ProductCategory, UserProductVariantWishlist, UserProductVariantCart, ShippingMethod, Invoice, InvoiceProduct
+from . models import Product, ProductVariant, ProductVariantSize, ProductVariantSizeOption, ProductAttribute, ProductAttributeOption, ProductCategory, UserProductVariantWishlist, UserProductVariantCart, ShippingMethod, Invoice, InvoiceProduct
 from account.models import UserProfile
 
 
 def index(req):
 
     product_variants = ProductVariant.objects.all().order_by('product__title')
+    product_variant_sizes = ProductVariantSize.objects.all()
 
     context = {
-        'product_variants': product_variants
+        'product_variants': product_variants,
+        'product_variant_sizes': product_variant_sizes
     }
     
     return render(req, 'pages/products/index.html', context)
@@ -72,13 +74,11 @@ def product_detail(req):
         all_sizes = ProductVariantSize.objects.filter(product_variant=product_variant_id)
         selected_size = [all_sizes[0]]
 
-    print(selected_size[0].stock)
-
     product_variant = ProductVariant.objects.filter(id=product_variant_id)[0]
     product_other_variants = ProductVariant.objects.filter(product=product_id)
     product_attributes = ProductAttribute.objects.filter(entity=product_variant_id)
 
-    product_variant_currently_in_carts = list(UserProductVariantCart.objects.filter(product_variant=product_variant.id).values_list('quantity', flat=True))
+    product_variant_currently_in_carts = list(UserProductVariantCart.objects.filter(Q(product_variant=product_variant.id), Q(size=selected_size[0].size)).values_list('quantity', flat=True))
 
     total_amount_in_carts = 0
 
@@ -162,7 +162,7 @@ def cart(req):
 
     cart_products = list(UserProductVariantCart.objects.filter(user=req.user).values_list('product_variant', flat=True))
     cart_product_quantity = UserProductVariantCart.objects.filter(user=req.user)
-    product_variants = ProductVariant.objects.filter(id__in=cart_products)
+    product_variants = UserProductVariantCart.objects.filter(user=req.user)
 
     cart_total = 0
 
@@ -183,9 +183,11 @@ def add_to_cart(req):
 
     if req.method == 'POST':
         product_variant_id = req.POST['product_variant_id']
+        product_variant_size = req.POST['product_variant_size']
         quantity = req.POST['quantity']
 
-        is_product_available = ProductVariant.objects.filter(Q(id=product_variant_id), Q(stock__gte=quantity)).exists()
+        is_product_available = ProductVariantSize.objects.filter(Q(product_variant=product_variant_id), Q(stock__gte=quantity)).exists()
+
         if is_product_available:
             product_already_in_cart = UserProductVariantCart.objects.filter(Q(user=req.user), Q(product_variant=product_variant_id))
             if product_already_in_cart:
@@ -193,10 +195,17 @@ def add_to_cart(req):
                 product_already_in_cart[0].save()
             else:
                 product = ProductVariant.objects.filter(id=product_variant_id)[0]
+
+                if product_variant_size == '':
+                    product_size = ProductVariantSize.objects.filter(product_variant=product_variant_id)[0]
+                else:
+                    product_size = ProductVariantSize.objects.filter(Q(size=product_variant_size), Q(product_variant=product_variant_id))[0]
+
                 user = req.user
                 new_cart_product = UserProductVariantCart()
                 new_cart_product.product_variant = product
                 new_cart_product.quantity = quantity
+                new_cart_product.size = product_size.size
                 new_cart_product.user = user
                 new_cart_product.save()
         else:
@@ -218,7 +227,7 @@ def increase_quantity(req):
         for product_variant_currently_in_cart in product_variant_currently_in_carts:
             total_amount_in_carts += product_variant_currently_in_cart
 
-        product_variant_stock = ProductVariant.objects.values_list('stock', flat=True).filter(id=product_variant)[0]
+        product_variant_stock = ProductVariantSize.objects.values_list('stock', flat=True).filter(product_variant=product_variant)[0]
 
         if product_variant_stock == total_amount_in_carts:
             print('not available at the moment')
@@ -411,7 +420,7 @@ def confirmation(req):
             new_invoice_product.save()
 
             ## Reduce the quantity in the database
-            product = ProductVariant.objects.filter(id=cart_product.product_variant.id)[0]
+            product = ProductVariantSize.objects.filter(product_variant=cart_product.product_variant.id)[0]
             product.stock -= cart_product.quantity
             product.save()
 

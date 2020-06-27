@@ -75,6 +75,7 @@ class UserProductVariantCart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product_variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
+    size = models.ForeignKey(ProductVariantSizeOption, on_delete=models.CASCADE, null=True)
 
     def total(self):
         return self.product_variant.price * self.quantity

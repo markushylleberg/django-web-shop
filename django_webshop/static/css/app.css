@@ -8,8 +8,8 @@
 
 .pressed {
     pointer-events: none;
-    background-color: lightgray;
-    border: 1px solid black;
+    background-color: rgb(107, 208, 255)!important;
+    color: white;
 }
 
 .order-confirm-wrapper img, .small-img {
@@ -159,4 +159,22 @@ b {
 
 .pointer {
     cursor: pointer;
+}
+
+.product-sizes div {
+    align-items: center;
+    display: grid;
+    justify-items: center;
+    align-items: center;
+}
+
+.sold-out {
+    color: red!important;
+}
+
+.sold-out-singlepage {
+    background-color: rgba(255, 0, 0, 0.596)!important;
+    pointer-events: none;
+    border: none!important;
+    color: white;
 }

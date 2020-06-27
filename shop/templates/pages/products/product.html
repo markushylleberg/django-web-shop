@@ -52,7 +52,9 @@
                     <div class="d-flex">
                         {% for product_size in product_sizes %}
                             {% if product_size == selected_size %}
-                                <div class="m-2 p-2 border pressed">{{ product_size.size }} <span class="very-small-text">({{ product_size.stock }})</span></div>
+                                <div class="m-2 p-2 border pressed">{{ product_size.size }}</div>
+                            {% elif product_size.stock == 0 %}
+                                <div class="m-2 p-2 border sold-out-singlepage">{{ product_size.size }}</div>
                             {% else %} 
                             <div>
                                 <form action="{% url 'shop:product_detail' %}">
@@ -60,7 +62,7 @@
                                     <input type="hidden" value="{{ product_size.product_variant.id }}" name="product_variant_id" />
                                     <input type="hidden" value="{{ product_size.size.id }}" name="product_variant_size" />
                                     <button class="m-2 p-2 border pointer">
-                                        {{ product_size.size }} <span class="very-small-text">({{ product_size.stock }})</span>
+                                        {{ product_size.size }}
                                     </button>
                                 </form>
                             </div>
@@ -75,6 +77,7 @@
                 <form action="{% url 'shop:add_to_cart' %}" method="POST">
                     {% csrf_token %}
                     <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
+                    <input type="hidden" value="{{ request.GET.product_variant_size }}" name="product_variant_size" />
                         {% if quantity %}
                               <div class="form-group w-25">
                                     <label for="quantity">Quantity </label>
