@@ -42,10 +42,12 @@ def categories(req):
         category_products = Product.objects.values_list('id', flat=True).filter(category=category_id)
         category_product_variants = ProductVariant.objects.filter(product__in=category_products)
         category_title = ProductCategory.objects.filter(id=category_id)[0]
+        product_variant_sizes = ProductVariantSize.objects.all()
 
         context = {
             'category_product_variants': category_product_variants,
-            'category_title': category_title
+            'category_title': category_title,
+            'product_variant_sizes': product_variant_sizes
         }
 
     return render(req, 'pages/products/categories.html', context)
@@ -148,11 +150,14 @@ def search(req):
 
         product_query = Product.objects.all().filter(id__in=variant_query)
 
+        product_variant_sizes = ProductVariantSize.objects.all()
+
         context = {
             'values': attributes_values_used,
             'attributes': attributes,
             'products': product_query,
-            'product_variants': final_return_query_product_variants
+            'product_variants': final_return_query_product_variants,
+            'product_variant_sizes': product_variant_sizes
         }
 
     return render(req, 'pages/products/search.html', context)
@@ -503,7 +508,7 @@ def sales_overview(req):
     total_revenue = Invoice.objects.aggregate(sum=Sum('total_price'))
     invoices = Invoice.objects.all()
     invoice_products = InvoiceProduct.objects.all()
-    sold_out_product_variants = ProductVariant.objects.filter(stock=0)
+    sold_out_product_variants = ProductVariantSize.objects.filter(stock=0)
 
     best_sellers = []
 

@@ -8,7 +8,7 @@
         <div class="m-4">
             <h4 class="px-2 dws-blue">Sales overview</h4>
             <p class="large-text"><i>Total orders:</i><b> {{ total_invoices }} </b></p>
-            <p class="large-text"><i>Total revenue:</i><span class="text-success"><b> {{ total_revenue.sum }} kr.</b></span></p>
+            <p class="large-text"><i>Total revenue:</i><span class="text-success"><b> {{ total_revenue.sum|floatformat:2 }} kr.</b></span></p>
         </div>
         <br />
         <div class="m-4">
@@ -34,8 +34,8 @@
             <h4 class="px-2 dws-blue">Items that has sold out</h4>
             {% for sold_out_product_variant in sold_out_product_variants %}
                 <div class="d-flex p-3 my-3 border">
-                    <p class="p-3"><b>{{ sold_out_product_variant.product.title }}</b></p>
-                    <img class="small-img img-fluid" src="{{ MEDIA_URL }} {{ sold_out_product_variant.image.url }}" />
+                    <p class="p-3"><b>{{ sold_out_product_variant.product_variant.product.title }}</b> (<span>{{ sold_out_product_variant.size }}</span>)</p>
+                    <img class="small-img img-fluid" src="{{ MEDIA_URL }} {{ sold_out_product_variant.product_variant.image.url }}" />
                     <div class="mx-2 pl-3">
                         <p class="p-3"><b>{{ sold_out_product_variant.stock }}</b> units left</p>
                     </div>

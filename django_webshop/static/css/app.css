@@ -162,10 +162,9 @@ b {
 }
 
 .product-sizes div {
-    align-items: center;
-    display: grid;
-    justify-items: center;
-    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
 }
 
 .sold-out {

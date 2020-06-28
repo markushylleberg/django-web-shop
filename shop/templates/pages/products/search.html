@@ -65,6 +65,21 @@
                                                 <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
                                                 <button class="btn btn-primary">View product</button>
                                             </form>
+
+                                            <div class="product-sizes">
+                                                <div class="d-flex mx-5">
+                                                    {% for product_variant_size in product_variant_sizes %}
+                                                        {% if product_variant_size.product_variant.id == product_variant.id %}
+                                                            {% if product_variant_size.stock == 0 %}
+                                                                <p class="m-2 sold-out">{{ product_variant_size.size }}</p>
+                                                            {% else %}
+                                                                <p class="m-2 dws-blue">{{ product_variant_size.size }}</p>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+
                                             <form class="mt-1" action="{% url 'shop:add_to_wishlist' %}" method="POST">
                                                 {% csrf_token %}
                                                 <input type="hidden" value="{{ product_variant.id }}" name="product_variant_id" />
