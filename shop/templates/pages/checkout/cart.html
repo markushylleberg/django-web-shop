@@ -26,6 +26,7 @@
                                 <form action="{% url 'shop:increase_quantity' %}" method="POST">
                                     {% csrf_token %}
                                     <input type="hidden" value="{{ cart_product_quantity.product_variant_id }}" name="product_variant_id">
+                                    <input type="hidden" value="{{ product_variant.size.id }}" name="product_variant_size">
                                     <button class="icon-btn large-text"><b>+</b></button>
                                 </form>
 

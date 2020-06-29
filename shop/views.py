@@ -223,6 +223,7 @@ def increase_quantity(req):
 
     if req.method == 'POST':
         product_variant = req.POST['product_variant_id']
+        product_variant_size = req.POST['product_variant_size']
         user = req.user
 
         product_variant_currently_in_carts = list(UserProductVariantCart.objects.filter(product_variant=product_variant).values_list('quantity', flat=True))
@@ -232,7 +233,7 @@ def increase_quantity(req):
         for product_variant_currently_in_cart in product_variant_currently_in_carts:
             total_amount_in_carts += product_variant_currently_in_cart
 
-        product_variant_stock = ProductVariantSize.objects.values_list('stock', flat=True).filter(product_variant=product_variant)[0]
+        product_variant_stock = ProductVariantSize.objects.values_list('stock', flat=True).filter(Q(product_variant=product_variant), Q(size=product_variant_size))[0]
 
         if product_variant_stock == total_amount_in_carts:
             print('not available at the moment')
